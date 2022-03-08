@@ -1,0 +1,19 @@
+<changelist name="All" date="1646728806685" recycled="false">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/All/shelved.patch" />
+  <option name="DESCRIPTION" value="All" />
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="src/staticresources/leaflet.resource" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/All/leaflet.resource" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="src/staticresources/spinner.gif" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/All/spinner.gif" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="IlluminatedCloud/Szkolenie/OfflineSymbolTable.zip" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/All/OfflineSymbolTable.zip" />
+  </binary>
+</changelist>
