@@ -53,7 +53,7 @@ private class HOSP_ContractOverlappingTest {
         System.assertNotEquals(5, contracts.size());
     }
 
-    private static List<Contract__c> testContracts(Integer contractNumber, Integer daysDelay, Hospital__c hospital, Doctor__c doctor){
+    private static List<Contract__c> testContracts(Integer contractNumber, Integer daysDelay, Hospital__c hospital, Doctor__c doctor) {
         List<Contract__c> contractsToAdd = new List<Contract__c>();
         for (Integer i = 0; i < contractNumber; i++) {
             Contract__c contract = new Contract__c(

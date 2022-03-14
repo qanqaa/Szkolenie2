@@ -30,11 +30,11 @@ public class HOSP_DoctorsListController {
         return [
                 SELECT Name, First_Name__c, Birthdate_Date__c, Country__c
                 FROM Doctor__c
+                LIMIT 50000
         ];
     }
 
     public List<Doctor__c> getDoctors(){
         return getRandomDoctors(doctorsNumber);
     }
-
 }

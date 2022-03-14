@@ -75,4 +75,3 @@ public with sharing class HOSP_ContractOverlappingService {
         return doctorsContractsInHospitals;
     }
 }
-

@@ -1,0 +1,28 @@
+<apex:page id="HOSP_SoapEditDoctor" standardController="Doctor__c" extensions="HOSP_SoapEditDoctorController" showHeader="false" sidebar="false">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <head>
+        <apex:slds />
+    </head>
+    <body class="slds-scope">
+    <apex:form >
+        <div class="slds-text-heading_large slds-p-vertical_medium">{!$Label.SOAP_Doctor_Edit}</div>
+        <apex:pageBlock mode="edit">
+            <apex:pageBlockSection title="{!$Label.Information}" columns="2">
+                <apex:inputField value="{!Doctor__c.Name}" required="true" styleClass="slds-input" style="width: 200px;"/>
+                <apex:inputField value="{!Doctor__c.Country__c}" styleClass="slds-input" style="width: 200px;"/>
+                <apex:inputField value="{!Doctor__c.First_Name__c}" styleClass="slds-input" style="width: 200px;"/>
+                <apex:inputField value="{!Doctor__c.Phone__c}" styleClass="slds-input" style="width: 200px;"/>
+                <apex:inputField value="{!Doctor__c.Specialty__c}" styleClass="slds-input" style="width: 200px;"/>
+                <apex:inputField value="{!Doctor__c.Birthdate_Date__c}" styleClass="slds-input" style="width: 115px;"/>
+                <apex:inputField value="{!Doctor__c.Licence_Number__c}" styleClass="slds-input" style="width: 200px;"/>
+                <apex:inputField value="{!Doctor__c.Email__c}" styleClass="slds-input" style="width: 200px;"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="{!$Label.Save}" action="{!saveDoctor}" styleClass="slds-button slds-button--brand"/>
+                <apex:commandButton value="{!$Label.Close}" onClick="window.top.close();" styleClass="slds-button slds-button--neutral"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+    </body>
+    </html>
+</apex:page>

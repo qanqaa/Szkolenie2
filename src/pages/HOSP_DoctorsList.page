@@ -1,8 +1,8 @@
 <apex:page id="HOSP_DoctorsList" controller="HOSP_DoctorsListController">
-    <apex:pageBlock>
+    <apex:pageBlock >
         <apex:pageBlockSection columns="1">
-            <h1> List of random doctors </h1>
-            <apex:pageBlockSectionItem>
+            <h1> {!$Label.List_of_random_doctors} </h1>
+            <apex:pageBlockSectionItem >
                 <apex:pageBlockTable value="{!doctors}" var="doctorRecord" style="width: 100%">
                     <apex:column value="{!doctorRecord.First_Name__c}"/>
                     <apex:column value="{!doctorRecord.Name}"/>

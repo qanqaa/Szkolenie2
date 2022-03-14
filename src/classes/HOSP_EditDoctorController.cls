@@ -6,7 +6,7 @@ public with sharing class HOSP_EditDoctorController {
         this.controller = controller;
     }
 
-    public PageReference saveNew() {
+    public PageReference saveNew(){
         SObject recentDoctor = controller.getRecord();
         upsert recentDoctor;
         return new PageReference('/' + ('' + recentDoctor.get('Id')).subString(0, 3) + '/e?');
