@@ -1,28 +1,39 @@
-<apex:page id="HOSP_SoapEditDoctor" standardController="Doctor__c" extensions="HOSP_SoapEditDoctorController" showHeader="false" sidebar="false">
-    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <head>
-        <apex:slds />
-    </head>
-    <body class="slds-scope">
-    <apex:form >
-        <div class="slds-text-heading_large slds-p-vertical_medium">{!$Label.SOAP_Doctor_Edit}</div>
-        <apex:pageBlock mode="edit">
-            <apex:pageBlockSection title="{!$Label.Information}" columns="2">
-                <apex:inputField value="{!Doctor__c.Name}" required="true" styleClass="slds-input" style="width: 200px;"/>
-                <apex:inputField value="{!Doctor__c.Country__c}" styleClass="slds-input" style="width: 200px;"/>
-                <apex:inputField value="{!Doctor__c.First_Name__c}" styleClass="slds-input" style="width: 200px;"/>
-                <apex:inputField value="{!Doctor__c.Phone__c}" styleClass="slds-input" style="width: 200px;"/>
-                <apex:inputField value="{!Doctor__c.Specialty__c}" styleClass="slds-input" style="width: 200px;"/>
-                <apex:inputField value="{!Doctor__c.Birthdate_Date__c}" styleClass="slds-input" style="width: 115px;"/>
-                <apex:inputField value="{!Doctor__c.Licence_Number__c}" styleClass="slds-input" style="width: 200px;"/>
-                <apex:inputField value="{!Doctor__c.Email__c}" styleClass="slds-input" style="width: 200px;"/>
-            </apex:pageBlockSection>
-            <apex:pageBlockButtons location="bottom">
-                <apex:commandButton value="{!$Label.Save}" action="{!saveDoctor}" styleClass="slds-button slds-button--brand"/>
-                <apex:commandButton value="{!$Label.Close}" onClick="window.top.close();" styleClass="slds-button slds-button--neutral"/>
-            </apex:pageBlockButtons>
-        </apex:pageBlock>
+<apex:page id="HOSP_SoapEditDoctor" controller="HOSP_SoapEditDoctorController" lightningStyleSheets="true"
+           showHeader="false" sidebar="false">
+    <apex:slds/>
+    <!--    <div class="slds-scope">-->
+    <apex:form id="editForm">
+        <div role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+             class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                </div>
+                <apex:pageBlock mode="edit">
+                    <apex:pageBlockSection id="pG" title="{!$Label.Information}" columns="2">
+                        <apex:inputField value="{!doctor.Name}" id="NameInput" required="true" styleClass="slds-input"
+                                         style="width: 200px;"/>
+                        <apex:inputField value="{!doctor.Country__c}" styleClass="slds-input" style="width: 200px;"/>
+                        <apex:inputField value="{!doctor.First_Name__c}" styleClass="slds-input" style="width: 200px;"/>
+                        <apex:inputField value="{!doctor.Phone__c}" styleClass="slds-input" style="width: 200px;"/>
+                        <apex:inputField value="{!doctor.Specialty__c}" styleClass="slds-input" style="width: 200px;"/>
+                        <apex:inputField value="{!doctor.Birthdate_Date__c}" styleClass="slds-input"
+                                         style="width: 115px;"/>
+                        <apex:inputField value="{!doctor.Licence_Number__c}" styleClass="slds-input"
+                                         style="width: 200px;"/>
+                        <apex:inputField value="{!doctor.Email__c}" styleClass="slds-input" style="width: 200px;"/>
+                    </apex:pageBlockSection>
+                </apex:pageBlock>
+                <div class="slds-modal__footer">
+                    <apex:commandButton value="{!$Label.Save}" action="{!saveDoctor}"
+                                        styleClass="slds-button slds-button--brand"/>
+                    <apex:commandButton value="{!$Label.Close}"
+                                        onClick="j$('[id$=addDoctorDiv]').addClass('hide-modal');"
+                                        reRender="addDoctorPanel" immediate="true"
+                                        styleClass="slds-button slds-button--neutral"/>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
     </apex:form>
-    </body>
-    </html>
+    <!--</div>-->
 </apex:page>

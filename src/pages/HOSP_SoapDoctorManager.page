@@ -1,107 +1,100 @@
-<apex:page id="HOSP_SoapDoctorManager" controller="HOSP_SoapDoctorManagerController">
-    <script>
-    function openPopup(){
-        var newWin = window.open('{!$Page.HOSP_SoapEditDoctor}', 'Popup',
-        'height=400, width=800, left=500, top=100, resizable=yes, scrollbars=yes, menubar=no, status=no');
-        if(window.focus){
-            newWin.focus();
-        }
-        return false;
+<apex:page id="HOSP_SoapDoctorManager" lightningStyleSheets="true" controller="HOSP_SoapDoctorManagerController">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+    .hide-modal{
+        display: none;
     }
+    </style>
+    <apex:slds/>
+
+    <div id="addDoctorDiv">
+        <apex:outputPanel>
+            <apex:include pageName="HOSP_SoapEditDoctor" id="HOSP_SoapEditDoctor"/>
+        </apex:outputPanel>
+    </div>
+
+    <div class="slds-scope">
+        <apex:form id="theForm">
+            <apex:pageMessages/>
+            <div class="slds-text-heading_large slds-p-vertical_medium">{!$Label.SOAP_Doctor_Manager}</div>
+            <apex:commandButton styleClass="slds-button slds-button_outline-brand" immediate="true"
+                                value="{!$Label.Create_New}"
+                                onClick="openDoctorModal();" reRender="addDoctorPanel"
+                                style="float: right; width: 120px; margin: 10px 0;"/>
+
+            <apex:pageBlock id="doctorSearcherPageBlock">
+                <apex:pageBlockSection>
+                    <apex:inputField styleClass="slds-input" id="firstName" value="{!doctor.First_Name__c}"
+                                     required="false"
+                                     style="width: 200px;"/>
+                    <apex:inputField styleClass="slds-input" id="lastName" value="{!doctor.Name}"
+                                     style="width: 200px;"/>
+                    <apex:inputField styleClass="slds-input" id="email" value="{!doctor.Email__c}"
+                                     style="width: 200px;"/>
+                    <apex:inputField styleClass="slds-input" id="country" value="{!doctor.Country__c}"
+                                     style="width: 200px;"
+                                     required="true"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2">
+                    <apex:pageBlockSectionItem>
+                        <apex:commandButton styleClass="slds-button slds-button--brand" action="{!searchDoctors}"
+                                            value="{!$Label.Search}"
+                                            rerender="doctorSearcherPageBlock,doctorsFound,dupa"
+                                            status="spinner" style="float: right; width: 120px; margin: 10px 0;"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem>
+                        <apex:actionRegion>
+                            <apex:commandButton styleClass="slds-button slds-button--neutral" action="{!clearResults}"
+                                                value="{!$Label.Clear}" status="spinner"
+                                                rerender="theForm" immediate="true"
+                                                style="float: left; width: 120px; margin: 10px 0;"/>
+                        </apex:actionRegion>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="1" id="doctorsFound">
+                    <apex:pageBlockSectionItem>
+                        <apex:pageBlockTable id="dupa"
+                                             styleClass="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+                                             value="{!allDoctors}" var="doctorRecord">
+                            <apex:column style="width: 10%" headerValue="{!$Label.Action}">
+                                <apex:commandLink action="{!deleteDoctor}" value="{!$Label.Delete}" status="spinner"
+                                                  rerender="theForm">
+                                    <apex:param assignTo="{!doctorIdToDelete}" name="doctorIdToDelete"
+                                                value="{!doctorRecord.ExternalId__c}"/>
+                                </apex:commandLink>
+                                <apex:commandLink reRender="pG,NameInput,dupa,editForm,HOSP_SoapEditDoctor,addDoctorPanel"
+                                                  action="{!updateDoctor}" value="{!$Label.Update}"
+                                                  style="margin-left: 10px;"/>
+                            </apex:column>
+                            <apex:column value="{!doctorRecord.First_Name__c}"/>
+                            <apex:column value="{!doctorRecord.Name}"/>
+                            <apex:column value="{!doctorRecord.Email__c}"/>
+                            <apex:column value="{!doctorRecord.Country__c}"/>
+                        </apex:pageBlockTable>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            <apex:actionStatus id="spinner">
+                <apex:facet name="start">
+                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.80; z-index: 1000; background-color: white;">
+                    </div>
+                    <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; z-index: 1001; margin: 10% 50%">
+                        <img src="{!$Resource.Spinner}"/>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+        </apex:form>
+    </div>
+    <script>
+        j$ = jQuery.noConflict();
+        j$('[id$=addDoctorDiv]').addClass('hide-modal');
+
+        function openDoctorModal() {
+            j$('[id$=addDoctorDiv]').removeClass('hide-modal');
+        }
+
+        function closeDoctorModal() {
+            j$('[id$=addDoctorDiv]').addClass('hide-modal');
+        }
     </script>
-    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <head>
-        <apex:slds />
-    </head>
-    <body class="slds-scope">
-    <apex:form id="theForm">
-        <apex:pageMessages />
-        <div class="slds-text-heading_large slds-p-vertical_medium">{!$Label.SOAP_Doctor_Manager}</div>
-        <apex:commandLink styleClass="slds-button slds-button_outline-brand" immediate="true"
-                          onClick="return openPopup()" value="{!$Label.Create_New}"
-                          style="float: right; width: 120px; margin: 10px 0;"/>
-
-        <apex:pageBlock id="doctorSearcherPageBlock">
-            <apex:pageBlockSection >
-                <apex:inputField styleClass="slds-input" id="firstName" value="{!doctor.First_Name__c}" required="false"
-                                 style="width: 200px;"/>
-                <apex:inputField styleClass="slds-input" id="lastName" value="{!doctor.Name}" style="width: 200px;"/>
-                <apex:inputField styleClass="slds-input" id="email" value="{!doctor.Email__c}" style="width: 200px;"/>
-                <apex:inputField styleClass="slds-input" id="country" value="{!doctor.Country__c}" style="width: 200px;"
-                                 required="true"/>
-            </apex:pageBlockSection>
-            <apex:pageBlockSection columns="2">
-                <apex:pageBlockSectionItem >
-                    <apex:commandButton styleClass="slds-button slds-button--brand" action="{!searchDoctors}"
-                                        value="{!$Label.Search}" rerender="doctorSearcherPageBlock,doctorsFound,dupa"
-                                        status="spinner" style="float: right; width: 120px; margin: 10px 0;"/>
-                </apex:pageBlockSectionItem>
-                <apex:pageBlockSectionItem >
-                    <apex:actionRegion >
-                        <apex:commandButton styleClass="slds-button slds-button--neutral" action="{!clearResults}"
-                                            value="{!$Label.Clear}" status="spinner"
-                                            rerender="theForm" immediate="true"
-                                            style="float: left; width: 120px; margin: 10px 0;"/>
-                    </apex:actionRegion>
-                </apex:pageBlockSectionItem>
-            </apex:pageBlockSection>
-            <apex:pageBlockSection columns="1" id="doctorsFound">
-                <apex:pageBlockSectionItem >
-                    <apex:pageBlockTable  id="dupa" styleClass="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
-                            value="{!allDoctors}" var="doctorRecord">
-                        <apex:column style="width: 10%" headerValue="{!$Label.Action}">
-                            <apex:commandLink action="{!deleteDoctor}" value="{!$Label.Delete}" status="spinner" rerender="theForm">
-                                <apex:param assignTo="{!doctorIdToDelete}" name="doctorIdToDelete"
-                                            value="{!doctorRecord.ExternalId__c}"/>
-                            </apex:commandLink>
-                            <apex:commandLink target="_blank"
-                                              action="/apex/HOSP_SoapEditDoctor?id={!doctorRecord.id}"
-                                              value="{!$Label.Update}"
-                                              style="margin-left: 10px;"/>
-                        </apex:column>
-                        <apex:column value="{!doctorRecord.First_Name__c}"/>
-                        <apex:column value="{!doctorRecord.Name}"/>
-                        <apex:column value="{!doctorRecord.Email__c}"/>
-                        <apex:column value="{!doctorRecord.Country__c}"/>
-                    </apex:pageBlockTable>
-                </apex:pageBlockSectionItem>
-            </apex:pageBlockSection>
-        </apex:pageBlock>
-        <apex:actionStatus id="spinner">
-            <apex:facet name="start">
-                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.80; z-index: 1000; background-color: white;">
-                </div>
-                <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; z-index: 1001; margin: 10% 50%">
-                    <img src="{!$Resource.Spinner}"/>
-                </div>
-            </apex:facet>
-        </apex:actionStatus>
-
-        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
-                    <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
-                    </svg>
-                    <span class="slds-assistive-text">Cancel and close</span>
-                </button>
-                <div class="slds-modal__header">
-                    <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Modal header</h1>
-                </div>
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <p>Sit nulla est ex deserunt exercitation anim occaecat. Nostrud ullamco deserunt aute id consequat veniam incididunt duis in sint irure nisi. Mollit officia cillum Lorem ullamco minim nostrud elit officia tempor esse quis. Cillum sunt ad dolore quis
-                        aute consequat ipsum magna exercitation reprehenderit magna. Tempor cupidatat consequat elit dolor adipisicing.</p>
-                    <p>Dolor eiusmod sunt ex incididunt cillum quis nostrud velit duis sit officia. Lorem aliqua enim laboris do dolor eiusmod officia. Mollit incididunt nisi consectetur esse laborum eiusmod pariatur proident. Eiusmod et adipisicing culpa deserunt nostrud
-                        ad veniam nulla aute est. Labore esse esse cupidatat amet velit id elit consequat minim ullamco mollit enim excepteur ea.</p>
-                </div>
-                <div class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close">Cancel</button>
-                    <button class="slds-button slds-button_brand">Save</button>
-                </div>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
-    </apex:form>
-    </body>
-    </html>
 </apex:page>

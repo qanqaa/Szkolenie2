@@ -10,13 +10,19 @@ public with sharing class HOSP_SoapDoctorManagerController {
     private final String lineDelimiter = '\n';
     public List<Doctor__c> doctors { get; set; }
     public boolean displayPopup {get;set;}
-    public Id doctorIdToDelete {get; set;}
+    public String doctorIdToDelete {get; set;}
+    public Doctor__c newDoctor {get; set;}
 
     public HOSP_SoapDoctorManagerController(){
         this.doctor = new Doctor__c();
+        this.newDoctor = new Doctor__c();
+        displayPopup = false;
+        System.debug('dupa');
     }
 
+
     public void searchDoctors() {
+        System.debug('SERACH ' + newDoctor);
         HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
         try{
             this.allDoctors = communicator.searchDoctors(createQuery());
@@ -27,9 +33,15 @@ public with sharing class HOSP_SoapDoctorManagerController {
         }
     }
 
+    public void updateDoctor(){
+        System.debug('przekierownaie');
+        HOSP_SoapEditDoctorController soapEditDoctorController = new HOSP_SoapEditDoctorController(allDoctors.get(2));
+        displayPopup = true;
+        System.debug('bbbbbbb' + displayPopup);
+    }
+
     public void deleteDoctor(){
         HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
-        System.debug(doctorIdToDelete);
         communicator.deleteDoctor(doctorIdToDelete);
         searchDoctors();
     }
@@ -78,6 +90,15 @@ public with sharing class HOSP_SoapDoctorManagerController {
     public void showPopup()
     {
         displayPopup = true;
+    }
+
+    public void saveDoctor(){
+        System.debug('fdfdffdf' + newDoctor);
+        HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
+//        newDoctor.First_Name__c = 'dupa';
+//        newDoctor.Name = 'dupa';
+//        newDoctor.Specialty__c = 'dupa';
+        communicator.addNewDoctor(newDoctor);
     }
 
 }

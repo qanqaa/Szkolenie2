@@ -29,7 +29,7 @@ global class HOSP_SOAPCommunicator {
         webSrv.SessionHeader = WebServiceSessionHeader;
     }
 
-    public void deleteDoctor(Id id){
+    public void deleteDoctor(String id){
         loginToSalesforce();
         System.debug('id to delete' + id);
         webSrv.deleteDoctor(id);

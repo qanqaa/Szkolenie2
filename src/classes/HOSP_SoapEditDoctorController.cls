@@ -1,22 +1,19 @@
 public with sharing class HOSP_SoapEditDoctorController {
-    ApexPages.StandardController controller { get; set; }
-    Doctor__c doctor {get; set;}
+    public Doctor__c doctor { get; set; }
 
-    public HOSP_SoapEditDoctorController(ApexPages.StandardController controller) {
-        this.controller = controller;
+
+    public HOSP_SoapEditDoctorController() {
+        this.doctor = new Doctor__c();
     }
 
-    public PageReference saveNew(){
-        SObject recentDoctor = controller.getRecord();
-        upsert recentDoctor;
-        return new PageReference('/' + ('' + recentDoctor.get('Id')).subString(0, 3) + '/e?');
+    public HOSP_SoapEditDoctorController(Doctor__c doctor) {
+        this.doctor = doctor;
+        System.debug('TOOO' + doctor);
     }
 
-    public PageReference saveDoctor(){
-        SObject recentDoctor = controller.getRecord();
-        Doctor__c doctor = (Doctor__c)recentDoctor;
+    public void saveDoctor() {
         HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
         communicator.addNewDoctor(doctor);
-        return null;
     }
+
 }
