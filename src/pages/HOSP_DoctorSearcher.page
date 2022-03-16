@@ -18,7 +18,7 @@
                 <apex:pageBlockSectionItem >
                     <apex:commandButton action="{!clearResults}" value="{!$Label.Clear}" status="spinner"
                                         rerender="doctorSearcherPageBlock" immediate="true"
-                                        rendered="{!IF(allDoctors.size>0, true, false)}"
+                                        rendered="{!IF(doctors.size>0, true, false)}"
                                         style="float: left; width: 120px; margin: 10px 0;"/>
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>

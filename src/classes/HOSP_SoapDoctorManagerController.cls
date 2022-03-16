@@ -1,53 +1,57 @@
 public with sharing class HOSP_SoapDoctorManagerController {
-
     public Doctor__c doctor { get; set; }
     public String searchQuery { get; set; }
     public Integer size { get; set; }
     public List<SelectOption> paginationSizeOptions { get; set; }
     public String FileBodyString { get; set; }
-    public List<Doctor__c> allDoctors { get; set; }
     private final String recordDelimiter = ',';
     private final String lineDelimiter = '\n';
     public List<Doctor__c> doctors { get; set; }
-    public boolean displayPopup {get;set;}
-    public String doctorIdToDelete {get; set;}
-    public Doctor__c newDoctor {get; set;}
+    public String doctorIdToDelete { get; set; }
+    public Doctor__c newDoctor { get; set; }
+    public Doctor__c updateDoctor { get; set; }
+    public String doctorToUpdate { get; set; }
 
-    public HOSP_SoapDoctorManagerController(){
+    public HOSP_SoapDoctorManagerController() {
         this.doctor = new Doctor__c();
         this.newDoctor = new Doctor__c();
-        displayPopup = false;
-        System.debug('dupa');
+        this.updateDoctor = new Doctor__c();
     }
 
+    public void saveDoctor() {
+        HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
+        communicator.addNewDoctor(newDoctor);
+        clearDoctor();
+    }
 
     public void searchDoctors() {
-        System.debug('SERACH ' + newDoctor);
         HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
-        try{
-            this.allDoctors = communicator.searchDoctors(createQuery());
-            System.debug(allDoctors);
-        }
-        catch(Exception e){
-            displayInfoMessage (Label.NoDoctorsFound);
+        try {
+            this.doctors = communicator.searchDoctors(createQuery());
+        } catch (Exception e) {
+            clearResults();
+            displayInfoMessage(Label.NoDoctorsFound);
         }
     }
 
-    public void updateDoctor(){
-        System.debug('przekierownaie');
-        HOSP_SoapEditDoctorController soapEditDoctorController = new HOSP_SoapEditDoctorController(allDoctors.get(2));
-        displayPopup = true;
-        System.debug('bbbbbbb' + displayPopup);
+    public void readDoctorRecord() {
+        for (Doctor__c doctorFromList : doctors) {
+            if (doctorFromList.ExternalId__c == doctorToUpdate) {
+                updateDoctor = doctorFromList;
+            }
+        }
     }
 
-    public void deleteDoctor(){
+    public void updateDoctors() {
         HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
-        communicator.deleteDoctor(doctorIdToDelete);
+        communicator.updateExistingDoctor(updateDoctor);
         searchDoctors();
     }
 
-    public List<Doctor__c> getDoctors() {
-        return allDoctors;
+    public void deleteDoctor() {
+        HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
+        communicator.deleteDoctor(doctorIdToDelete);
+        searchDoctors();
     }
 
     public String createQuery() {
@@ -60,8 +64,8 @@ public with sharing class HOSP_SoapDoctorManagerController {
             if (string.isNotBlank(doctor.Name)) {
                 return searchQuery += ' AND Name LIKE \'%' + doctor.Name + '%\'';
             }
-            if (string.isNotBlank(doctor.Email__c)) {
-                return searchQuery += ' AND Email__c LIKE \'%' + doctor.Email__c + '%\'';
+            if (string.isNotBlank(doctor.EmailSearch__c)) {
+                return searchQuery += ' AND Email__c LIKE \'%' + doctor.EmailSearch__c + '%\'';
             }
             return searchQuery;
         } else {
@@ -75,30 +79,25 @@ public with sharing class HOSP_SoapDoctorManagerController {
 
     public void clearResults() {
         try {
-            allDoctors.clear();
-            doctor.clear();
-            doctor.Country__c = null;
+            if(doctor != null){
+                doctor.clear();
+                doctor.Country__c = null;
+            }
+            if(doctors != null){
+                doctors.clear();
+                doctors = null;
+            }
         } catch (Exception e) {
             displayInfoMessage(e.getMessage());
         }
     }
 
-    public void closePopup()
-    {
-        displayPopup = false;
+    public void clearDoctor() {
+        try {
+            newDoctor.clear();
+            newDoctor.Country__c = null;
+        } catch (Exception e) {
+            displayInfoMessage(e.getMessage());
+        }
     }
-    public void showPopup()
-    {
-        displayPopup = true;
-    }
-
-    public void saveDoctor(){
-        System.debug('fdfdffdf' + newDoctor);
-        HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
-//        newDoctor.First_Name__c = 'dupa';
-//        newDoctor.Name = 'dupa';
-//        newDoctor.Specialty__c = 'dupa';
-        communicator.addNewDoctor(newDoctor);
-    }
-
 }

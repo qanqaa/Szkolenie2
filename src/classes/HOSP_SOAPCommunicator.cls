@@ -1,6 +1,8 @@
 global class HOSP_SOAPCommunicator {
     Doctor__c doctor { get; set; }
+    Doctor__c doctorToUpdate { get; set; }
     soapSforceComSchemasClassNewDoctor.DoctorDTO doctorDTO { get; set; }
+    soapSforceComSchemasClassNewDoctor.DoctorDTO doctorToUpdateDTO { get; set; }
     public static soapSforceComSchemasClassNewDoctor.HospitalWebService webSrv { get; set; }
     public String searchQuery { get; set; }
 
@@ -13,7 +15,20 @@ global class HOSP_SOAPCommunicator {
         this.doctorDTO.country = doctor.Country__c;
         this.doctorDTO.phone = doctor.Phone__c;
         this.doctorDTO.emailAdr = doctor.Email__c;
-        sendData(doctorDTO);
+        createDoctor(doctorDTO);
+    }
+
+    public void updateExistingDoctor(Doctor__c doctor) {
+        this.doctorToUpdateDTO = new soapSforceComSchemasClassNewDoctor.DoctorDTO();
+        this.doctorToUpdateDTO.drID = doctor.ExternalId__c;
+        this.doctorToUpdateDTO.lastName = doctor.Name;
+        this.doctorToUpdateDTO.firstName = doctor.First_Name__c;
+        this.doctorToUpdateDTO.specialty = doctor.Specialty__c;
+        this.doctorToUpdateDTO.licenceNumber = doctor.Licence_Number__c;
+        this.doctorToUpdateDTO.country = doctor.Country__c;
+        this.doctorToUpdateDTO.phone = doctor.Phone__c;
+        this.doctorToUpdateDTO.emailAdr = doctor.Email__c;
+        updateDoctor(doctorToUpdateDTO);
     }
 
     public static void loginToSalesforce() {
@@ -29,12 +44,16 @@ global class HOSP_SOAPCommunicator {
         webSrv.SessionHeader = WebServiceSessionHeader;
     }
 
-    public void deleteDoctor(String id){
+    public void updateDoctor(soapSforceComSchemasClassNewDoctor.DoctorDTO doctorToUpdateDTO) {
         loginToSalesforce();
-        System.debug('id to delete' + id);
+        webSrv.updateDoctor(doctorToUpdateDTO);
+    }
+
+    public void deleteDoctor(String id) {
+        loginToSalesforce();
         webSrv.deleteDoctor(id);
     }
-    public static void sendData(soapSforceComSchemasClassNewDoctor.DoctorDTO doctorDTO) {
+    public static void createDoctor(soapSforceComSchemasClassNewDoctor.DoctorDTO doctorDTO) {
         loginToSalesforce();
         webSrv.createNewDoctor(doctorDTO);
     }
@@ -42,30 +61,28 @@ global class HOSP_SOAPCommunicator {
     public List<Doctor__c> searchDoctors(String query) {
         this.searchQuery = query;
         loginToSalesforce();
-        System.debug('query:' + searchQuery);
         List<soapSforceComSchemasClassNewDoctor.DoctorDTO> doctorsDTO = webSrv.searchDoctors(query);
-        List<Doctor__c> doctors = new List<Doctor__c>();
-        for (soapSforceComSchemasClassNewDoctor.DoctorDTO doctorDTO : doctorsDTO) {
-            System.debug(doctorDTO);
-            try{
-                Doctor__c newDoctor = new Doctor__c(
-                        ExternalId__c = doctorDTO.drID,
-                        Name = doctorDTO.lastName,
-                        First_Name__c = doctorDTO.firstName,
-                        Email__c = doctorDTO.emailAdr,
-                        Country__c = doctorDTO.country,
-                        Specialty__c = doctorDTO.specialty,
-                        Licence_Number__c = doctorDTO.licenceNumber,
-                        Phone__c = doctorDTO.phone);
-                doctors.add(newDoctor);
-                System.debug('dupa ' + newDoctor);
+        if (!doctorsDTO.isEmpty()) {
+            List<Doctor__c> doctors = new List<Doctor__c>();
+            for (soapSforceComSchemasClassNewDoctor.DoctorDTO doctorDTO : doctorsDTO) {
+                try {
+                    Doctor__c newDoctor = new Doctor__c(
+                            ExternalId__c = doctorDTO.drID,
+                            Name = doctorDTO.lastName,
+                            First_Name__c = doctorDTO.firstName,
+                            Email__c = doctorDTO.emailAdr,
+                            Country__c = doctorDTO.country,
+                            Specialty__c = doctorDTO.specialty,
+                            Licence_Number__c = doctorDTO.licenceNumber,
+                            Phone__c = doctorDTO.phone);
+                    doctors.add(newDoctor);
+                } catch (Exception e) {
+                    ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR,Label.Error));
+                }
             }
-            catch(Exception e){
-                System.debug(e.getMessage());
-            }
-
+            return doctors;
         }
-        return doctors;
+        return null;
     }
 
     global class DoctorDTO {
