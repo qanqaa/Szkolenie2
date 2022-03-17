@@ -5,8 +5,10 @@ global class HOSP_SOAPCommunicator {
     soapSforceComSchemasClassNewDoctor.DoctorDTO doctorToUpdateDTO { get; set; }
     public static soapSforceComSchemasClassNewDoctor.HospitalWebService webSrv { get; set; }
     public String searchQuery { get; set; }
+    public Boolean shouldCloseAddDoctorModal {get; set;}
+    public Boolean shouldCloseUpdateDoctorModal {get; set;}
 
-    public void addNewDoctor(Doctor__c doctor) {
+    public Boolean addNewDoctor(Doctor__c doctor) {
         this.doctorDTO = new soapSforceComSchemasClassNewDoctor.DoctorDTO();
         this.doctorDTO.lastName = doctor.Name;
         this.doctorDTO.firstName = doctor.First_Name__c;
@@ -15,10 +17,10 @@ global class HOSP_SOAPCommunicator {
         this.doctorDTO.country = doctor.Country__c;
         this.doctorDTO.phone = doctor.Phone__c;
         this.doctorDTO.emailAdr = doctor.Email__c;
-        createDoctor(doctorDTO);
+        return createDoctor(doctorDTO);
     }
 
-    public void updateExistingDoctor(Doctor__c doctor) {
+    public Boolean updateExistingDoctor(Doctor__c doctor) {
         this.doctorToUpdateDTO = new soapSforceComSchemasClassNewDoctor.DoctorDTO();
         this.doctorToUpdateDTO.drID = doctor.ExternalId__c;
         this.doctorToUpdateDTO.lastName = doctor.Name;
@@ -28,7 +30,7 @@ global class HOSP_SOAPCommunicator {
         this.doctorToUpdateDTO.country = doctor.Country__c;
         this.doctorToUpdateDTO.phone = doctor.Phone__c;
         this.doctorToUpdateDTO.emailAdr = doctor.Email__c;
-        updateDoctor(doctorToUpdateDTO);
+        return updateDoctor(doctorToUpdateDTO);
     }
 
     public static void loginToSalesforce() {
@@ -44,18 +46,21 @@ global class HOSP_SOAPCommunicator {
         webSrv.SessionHeader = WebServiceSessionHeader;
     }
 
-    public void updateDoctor(soapSforceComSchemasClassNewDoctor.DoctorDTO doctorToUpdateDTO) {
+    public Boolean updateDoctor(soapSforceComSchemasClassNewDoctor.DoctorDTO doctorToUpdateDTO) {
         loginToSalesforce();
-        webSrv.updateDoctor(doctorToUpdateDTO);
+        shouldCloseUpdateDoctorModal = webSrv.updateDoctor(doctorToUpdateDTO);
+        return shouldCloseUpdateDoctorModal;
     }
 
     public void deleteDoctor(String id) {
         loginToSalesforce();
         webSrv.deleteDoctor(id);
     }
-    public static void createDoctor(soapSforceComSchemasClassNewDoctor.DoctorDTO doctorDTO) {
+
+    public Boolean createDoctor(soapSforceComSchemasClassNewDoctor.DoctorDTO doctorDTO) {
         loginToSalesforce();
-        webSrv.createNewDoctor(doctorDTO);
+        shouldCloseAddDoctorModal = webSrv.createNewDoctor(doctorDTO);
+        return shouldCloseAddDoctorModal;
     }
 
     public List<Doctor__c> searchDoctors(String query) {

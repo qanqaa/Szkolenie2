@@ -70,13 +70,13 @@
                     </div>
                     <div class="slds-modal__footer">
                         <apex:commandButton value="{!$Label.Save}" styleClass="slds-button slds-button_brand"
-                                            action="{!saveDoctor}"
+                                            action="{!saveDoctor}" onComplete="closeAddDoctorModal({!shouldCloseAddDoctorModal}); return false;"
                                             reRender="doctorSearcherPageBlock,theForm, editForm, modal-content-id-1,editPageMsg"
                                             status="spinner"/>
                         <apex:commandButton value="{!$Label.Close}" styleClass="slds-button slds-button_outline-brand"
                                             action="{!clearDoctor}"
                                             reRender="editForm" immediate="true"
-                                            onComplete="closeAddDoctorModal(); return false;"/>
+                                            onComplete="closeAddDoctorModal(true); return false;"/>
                     </div>
                 </div>
             </div>

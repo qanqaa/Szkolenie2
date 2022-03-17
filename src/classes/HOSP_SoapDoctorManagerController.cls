@@ -11,17 +11,21 @@ public with sharing class HOSP_SoapDoctorManagerController {
     public Doctor__c newDoctor { get; set; }
     public Doctor__c updateDoctor { get; set; }
     public String doctorToUpdate { get; set; }
+    public Boolean shouldCloseAddDoctorModal {get; set;}
+    public Boolean shouldCloseUpdateDoctorModal {get; set;}
+    public String emailAddress {get; set;}
 
     public HOSP_SoapDoctorManagerController() {
         this.doctor = new Doctor__c();
         this.newDoctor = new Doctor__c();
         this.updateDoctor = new Doctor__c();
+        this.shouldCloseAddDoctorModal = false;
+        this.shouldCloseUpdateDoctorModal = false;
     }
 
     public void saveDoctor() {
         HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
-        communicator.addNewDoctor(newDoctor);
-        clearDoctor();
+        shouldCloseAddDoctorModal = communicator.addNewDoctor(newDoctor);
     }
 
     public void searchDoctors() {
@@ -29,12 +33,12 @@ public with sharing class HOSP_SoapDoctorManagerController {
         try {
             this.doctors = communicator.searchDoctors(createQuery());
         } catch (Exception e) {
-            clearResults();
             displayInfoMessage(Label.NoDoctorsFound);
         }
     }
 
     public void readDoctorRecord() {
+        shouldCloseUpdateDoctorModal = false;
         for (Doctor__c doctorFromList : doctors) {
             if (doctorFromList.ExternalId__c == doctorToUpdate) {
                 updateDoctor = doctorFromList;
@@ -44,7 +48,7 @@ public with sharing class HOSP_SoapDoctorManagerController {
 
     public void updateDoctors() {
         HOSP_SOAPCommunicator communicator = new HOSP_SOAPCommunicator();
-        communicator.updateExistingDoctor(updateDoctor);
+        shouldCloseUpdateDoctorModal = communicator.updateExistingDoctor(updateDoctor);
         searchDoctors();
     }
 
@@ -64,9 +68,10 @@ public with sharing class HOSP_SoapDoctorManagerController {
             if (string.isNotBlank(doctor.Name)) {
                 return searchQuery += ' AND Name LIKE \'%' + doctor.Name + '%\'';
             }
-            if (string.isNotBlank(doctor.EmailSearch__c)) {
-                return searchQuery += ' AND Email__c LIKE \'%' + doctor.EmailSearch__c + '%\'';
+            if (!String.isBlank(emailAddress)) {
+                return searchQuery += ' AND Email__c LIKE \'%' + emailAddress + '%\'';
             }
+            System.debug(searchQuery);
             return searchQuery;
         } else {
             return null;
@@ -94,6 +99,7 @@ public with sharing class HOSP_SoapDoctorManagerController {
 
     public void clearDoctor() {
         try {
+            shouldCloseAddDoctorModal = false;
             newDoctor.clear();
             newDoctor.Country__c = null;
         } catch (Exception e) {

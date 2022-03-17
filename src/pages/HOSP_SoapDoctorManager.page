@@ -4,7 +4,6 @@
     .hide-modal{
         display: none;
     }
-
     </style>
     <apex:slds/>
     <div class="slds-scope">
@@ -12,29 +11,39 @@
             <apex:panelGrid columns="2">
                 <div class="slds-text-heading_large slds-p-vertical_medium">{!$Label.SOAP_Doctor_Manager}</div>
                 <apex:commandButton styleClass="slds-button slds-button--brand" immediate="true"
-                                    value="{!$Label.NewDoctor}"
+                                    value="{!$Label.NewDoctor}" action="{!clearDoctor}"
                                     onClick="openAddDoctorModal();" reRender="editForm"
                                     style="float: right; width: 120px; margin: 20px 40px;"/>
             </apex:panelGrid>
             <apex:pageBlock id="doctorSearcherPageBlock">
                 <apex:pageBlockSection>
-                    <apex:inputField styleClass="slds-input" id="firstName" value="{!doctor.First_Name__c}"
-                                     required="false"
-                                     style="width: 200px;"/>
-                    <apex:inputField styleClass="slds-input" id="lastName" value="{!doctor.Name}"
-                                     style="width: 200px;"/>
-                    <apex:inputField styleClass="slds-input" id="email" value="{!doctor.EmailSearch__c}"
-                                     style="width: 200px;"/>
-                    <apex:inputField styleClass="slds-input" id="country" value="{!doctor.Country__c}"
-                                     style="width: 200px;"
-                                     required="true"/>
+                    <apex:pageBlockSectionItem>
+                        <apex:outputLabel value="{!$Label.FirstName}" for="firstName"/>
+                        <apex:inputText styleClass="slds-input" id="firstName" value="{!doctor.First_Name__c}"
+                                        style="width: 200px;"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem>
+                        <apex:outputLabel value="{!$Label.LastName}" for="lastName"/>
+                        <apex:inputText styleClass="slds-input" id="lastName" value="{!doctor.Name}"
+                                        style="width: 200px;"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem>
+                        <apex:outputLabel value="{!$Label.Email}" for="email"/>
+                        <apex:inputText styleClass="slds-input" id="email" value="{!emailAddress}"
+                                        style="width: 200px;"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem>
+                        <apex:outputLabel value="{!$Label.CountryName}" for="country"/>
+                        <apex:inputField styleClass="slds-input" id="country" value="{!doctor.Country__c}"
+                                         style="width: 200px;"/>
+                    </apex:pageBlockSectionItem>
                 </apex:pageBlockSection>
                 <apex:pageBlockSection columns="2">
                     <apex:pageBlockSectionItem>
                         <apex:commandButton status="spinner" styleClass="slds-button slds-button--brand"
                                             action="{!searchDoctors}"
                                             value="{!$Label.Search}"
-                                            rerender="theForm,mainPageErrorMsg, noDoctorsFound"
+                                            rerender="theForm"
                                             style="float: right; width: 120px; margin: 10px 0;"/>
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
@@ -113,7 +122,7 @@
                     </div>
                     <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                         <p style="text-align: center">
-                            Are you sure you want to delete this Doctor?
+                            {!$Label.DeleteConfirmation} 
                         </p>
                     </div>
                     <div class="slds-modal__footer">
@@ -139,16 +148,21 @@
             j$('[id$=addDoctorPanel]').removeClass('hide-modal');
         }
 
-        function closeAddDoctorModal() {
-            j$('[id$=addDoctorPanel]').addClass('hide-modal');
+        function closeAddDoctorModal(shouldCloseAddDoctorModal) {
+            if(shouldCloseAddDoctorModal){
+                j$('[id$=addDoctorPanel]').addClass('hide-modal');
+            }
+            console.log(shouldCloseAddDoctorModal);
         }
 
         function openDoctorUpdateModal() {
             j$('[id$=updateDoctorPanel]').removeClass('hide-modal');
         }
 
-        function closeDoctorUpdateModal() {
-            j$('[id$=updateDoctorPanel]').addClass('hide-modal');
+        function closeDoctorUpdateModal(shouldCloseUpdateDoctorModal) {
+            if(shouldCloseUpdateDoctorModal){
+                j$('[id$=updateDoctorPanel]').addClass('hide-modal');
+            }
         }
 
         function openDeleteConfirmationModal() {
