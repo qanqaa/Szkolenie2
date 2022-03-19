@@ -34,7 +34,7 @@
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
                         <apex:outputLabel value="{!$Label.CountryName}" for="country"/>
-                        <apex:inputField styleClass="slds-input" id="country" value="{!doctor.Country__c}"
+                        <apex:inputField styleClass="slds-input" id="country" required="true" value="{!doctor.Country__c}"
                                          style="width: 200px;"/>
                     </apex:pageBlockSectionItem>
                 </apex:pageBlockSection>

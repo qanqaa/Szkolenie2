@@ -10,6 +10,7 @@ public with sharing class HOSP_ContractTriggerHandler extends HOSP_TriggerHandle
         this.oldMap = (Map<Id, Contract__c>) Trigger.oldMap;
         this.newMap = (Map<Id, Contract__c>) Trigger.newMap;
     }
+    
     protected override void beforeInsert() {
         HOSP_ContractOverlappingService.checkIfContractDatesOverlap(this.newList);
     }

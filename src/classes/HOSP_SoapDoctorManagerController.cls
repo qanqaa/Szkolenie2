@@ -33,6 +33,7 @@ public with sharing class HOSP_SoapDoctorManagerController {
         try {
             this.doctors = communicator.searchDoctors(createQuery());
         } catch (Exception e) {
+            clearResults();
             displayInfoMessage(Label.NoDoctorsFound);
         }
     }
@@ -68,7 +69,7 @@ public with sharing class HOSP_SoapDoctorManagerController {
             if (string.isNotBlank(doctor.Name)) {
                 return searchQuery += ' AND Name LIKE \'%' + doctor.Name + '%\'';
             }
-            if (!String.isBlank(emailAddress)) {
+            if (string.isNotEmpty(emailAddress)) {
                 return searchQuery += ' AND Email__c LIKE \'%' + emailAddress + '%\'';
             }
             System.debug(searchQuery);
