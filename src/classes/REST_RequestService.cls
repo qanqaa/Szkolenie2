@@ -1,9 +1,12 @@
-@RestResource(urlMapping = '/Hospital__c/*')
 global class REST_RequestService {
 
-    @HttpPost
-    global static List<REST_SyncRequest> insertHospitals(List<REST_HospitalDTO> hospitalsDTO) {
+    public static List<REST_SyncRequest> insertHospitals(String body) {
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
+        if (body == null || body == '') {
+            syncRequests.add(new REST_SyncRequest(REST_OperationType.READ_RECORD.name(), null, 'Received empty or null request.'));
+            return syncRequests;
+        }
+        List<REST_HospitalDTO> hospitalsDTO = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
         List<Hospital__c> hospitals = REST_ObjectMapper.mapToHospitals(hospitalsDTO);
 
         Database.SaveResult[] saveResults = Database.insert(hospitals, false);
@@ -16,10 +19,8 @@ global class REST_RequestService {
         return syncRequests;
     }
 
-    @HttpGet
-    global static List<REST_SyncRequest> readHospitalsByParameters() {
+    public static List<REST_SyncRequest> readHospitalsByParameters(String body) {
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
-        String body = RestContext.request.requestBody.toString();
         if (body == null || body == '') {
             syncRequests.add(new REST_SyncRequest(REST_OperationType.READ_RECORD.name(), null, 'Received empty or null request.'));
             return syncRequests;
@@ -37,11 +38,9 @@ global class REST_RequestService {
         return syncRequests;
     }
 
-    @HttpPatch
-    global static List<REST_SyncRequest> updateHospitals() {
+    public static List<REST_SyncRequest> updateHospitals(String body) {
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
         List<Hospital__c> hospitals = new List<Hospital__c>();
-        String body = RestContext.request.requestBody.toString();
         try {
             List<REST_HospitalDTO> hospitalsDTO = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
             List<Id> hospitalsId = new List<Id>();
@@ -75,15 +74,17 @@ global class REST_RequestService {
         }
     }
 
-    @HttpDelete
-    global static List<REST_SyncRequest> deleteHospitals() {
+    public static List<REST_SyncRequest> deleteHospitals(String body) {
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
         try {
-            String body = RestContext.request.requestBody.toString();
             List<REST_HospitalDTO> hospitalsDTOIds = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
 
             List<Id> hospitalsIds = getIds(hospitalsDTOIds);
             List<Hospital__c> hospitals = getHospitals(hospitalsIds);
+            if (hospitals.isEmpty()) {
+                syncRequests.add(new REST_SyncRequest(REST_OperationType.UPDATE_RECORD.name(), null, 'No records found with specified ID.'));
+                return syncRequests;
+            }
 
             Database.DeleteResult[] deleteResults = Database.delete(hospitals, false);
             String[] deleteResultsMsg = decodeDatabaseDeleteResults(deleteResults);
@@ -106,6 +107,7 @@ global class REST_RequestService {
         }
         return hospitalsIds;
     }
+
 
     public static List<Hospital__c> getHospitals(List<Id> externalHospitalsIds) {
         List<Hospital__c> hospitals = new List<Hospital__c>();
@@ -153,7 +155,7 @@ global class REST_RequestService {
     }
 
     public static String createQuery(REST_HospitalDTO hospitalParameters) {
-        String searchQuery = 'SELECT Id, Name, Address__c FROM Hospital__c';
+        String searchQuery = 'SELECT Id, Name, Address__c, ExternalId__c FROM Hospital__c';
         if (string.isNotBlank(hospitalParameters.name)) {
             searchQuery += ' WHERE Name LIKE \'%' + hospitalParameters.name + '%\'';
             if (string.isNotBlank(hospitalParameters.address)) {
@@ -165,5 +167,4 @@ global class REST_RequestService {
             return null;
         }
     }
-
 }

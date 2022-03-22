@@ -10,7 +10,8 @@ public class REST_ObjectMapper {
                 Hospital__c hospital = new Hospital__c(
                         Id = hospitalDTO.hospitalId,
                         Name = hospitalDTO.name,
-                        Address__c = hospitalDTO.address);
+                        Address__c = hospitalDTO.address,
+                        ExternalId__c = hospitalDTO.externalId);
                 hospitals.add(hospital);
             }
         } catch (Exception e) {
@@ -48,6 +49,29 @@ public class REST_ObjectMapper {
             return null;
         }
         return recordsToSync;
+    }
+
+    public static List<Hospital__c> mapFromSyncRequestsToHospitals(List<REST_SyncRequest> syncRequests) {
+        List<Hospital__c> hospitals = new List<Hospital__c>();
+        List<REST_HospitalDTO> hospitalsDTO = new List<REST_HospitalDTO>();
+        try {
+            for (REST_SyncRequest syncRequest : syncRequests) {
+                hospitalsDTO.add(syncRequest.hospitalDTO);
+            }
+            for (REST_HospitalDTO hospitalDTO : hospitalsDTO) {
+                Hospital__c hospital = new Hospital__c(
+                        Id = hospitalDTO.externalId,
+                        Name = hospitalDTO.name,
+                        Address__c = hospitalDTO.address,
+                        ExternalId__c = hospitalDTO.hospitalId);
+                hospitals.add(hospital);
+            }
+            System.debug('mapowanie z sync do hospitala: ' + hospitals);
+        } catch (Exception e) {
+            System.debug(e.getMessage());
+            return null;
+        }
+        return hospitals;
     }
 
 }

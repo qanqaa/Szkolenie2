@@ -8,6 +8,8 @@ public with sharing class HOSP_ImportDoctorsController {
     public Doctor__c doctor { get; set; }
     public List<Doctor__c> doctors { get; set; }
     public List<DoctorWrapper> wrappedDoctors { get; set; }
+    public Boolean shouldCloseAddDoctorModal {get; set;}
+    public Boolean shouldCloseUpdateDoctorModal {get; set;}
 
     public HOSP_ImportDoctorsController() {
         csvFileLines = new String[]{};

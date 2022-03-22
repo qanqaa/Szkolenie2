@@ -12,14 +12,14 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
     }
 
     protected override void afterInsert() {
-//        System.enqueueJob(REST_SyncServiceQueueable(REST_OperationType.INSERT_RECORD.name(), this.newList));
+        System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.INSERT_RECORD.name(), this.newList));
     }
 
     protected override void afterUpdate() {
-//        System.enqueueJob(REST_SyncServiceQueueable(REST_OperationType.UPDATE_RECORD.name(), this.newList));
+        //System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
     }
 
     protected override void afterDelete() {
-//        System.enqueueJob(REST_SyncServiceQueueable(REST_OperationType.DELETE_RECORD.name(), this.oldList));
+        //System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.DELETE_RECORD.name(), this.oldList));
     }
 }
