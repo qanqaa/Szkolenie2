@@ -16,10 +16,10 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
     }
 
     protected override void afterUpdate() {
-        //System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
+       System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
     }
 
     protected override void afterDelete() {
-        //System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.DELETE_RECORD.name(), this.oldList));
+        System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.DELETE_RECORD.name(), this.oldList));
     }
 }

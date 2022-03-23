@@ -53,12 +53,12 @@
                     <apex:pageBlockSectionItem>
                         <apex:outputLabel value="{!$Label.Name}" for="name"/>
                         <apex:inputText styleClass="slds-input" id="name" value="{!hospital.Name}"
-                                        style="width: 200px;"/>
+                                        style="width: 250px;"/>
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
                         <apex:outputLabel value="{!$Label.Address}" for="address"/>
                         <apex:inputText styleClass="slds-input" id="address" value="{!hospital.Address__c}"
-                                        style="width: 200px;"/>
+                                        style="width: 250px;"/>
                     </apex:pageBlockSectionItem>
                 </apex:pageBlockSection>
                 <apex:pageBlockSection columns="2">
@@ -73,7 +73,7 @@
                         <apex:actionRegion>
                             <apex:commandButton styleClass="slds-button slds-button--neutral" action="{!clearResults}"
                                                 value="{!$Label.Clear}" status="spinner"
-                                                disabled="{!IF(hospitals.size!=null, false, true)}"
+                                                disabled="{!IF(hospitalsTableWrapper.size!=null, false, true)}"
                                                 rerender="theForm" immediate="true"
                                                 style="float: left; width: 120px; margin: 10px 0;"/>
                         </apex:actionRegion>
@@ -85,30 +85,36 @@
                                 {!$Label.Hospitals}
                         </span>
                     </h1>
-                    <p>Items: {!IF(hospitals.size!=null, hospitals.size, '0')}</p>
-                    <p>{!IF(hospitals.size!=null,'', $Label.NoHospitalsToDisplay)}</p>
+                    <p>Items: {!IF(hospitalsTableWrapper.size!=null, hospitalsTableWrapper.size, '0')}</p>
+                    <p>{!IF(hospitalsTableWrapper.size!=null,'', $Label.NoHospitalsToDisplay)}</p>
                 </apex:pageBlockSection>
-                <apex:pageBlockSection columns="1" id="hospitalsFound" rendered="{!IF(hospitals.size!=null, true, false)}">
+                <apex:pageBlockSection columns="1" id="hospitalsFound" rendered="{!IF(hospitalsTableWrapper.size!=null, true, false)}">
                     <apex:pageBlockSectionItem>
                         <apex:pageBlockTable id="hospitalsRecords"
                                              styleClass="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
-                                             value="{!hospitals}" var="hospitalRecord">
+                                             value="{!hospitalsTableWrapper}" var="hospitalRecord">
                             <apex:column style="width: 10%" headerValue="{!$Label.Action}">
                                 <apex:commandLink onClick="openDeleteConfirmationModal();" value="{!$Label.Delete}"
                                                   rerender="theForm">
-                                    <apex:param assignTo="{!hospitalIdToDelete}" name="hospitalIdToDelete"
-                                                value="{!hospitalRecord.ExternalId__c}"/>
+                                    <apex:param assignTo="{!hospitalToDelete}" name="hospitalToDelete"
+                                                value="{!hospitalRecord.hospitalId}"/>
                                 </apex:commandLink>
                                 <apex:commandLink action="{!readHospitalRecord}" value="{!$Label.Update}"
                                                   onComplete="openHospitalUpdateModal();"
                                                   reRender="updateForm" style="margin-left: 10px;">
                                     <apex:param assignTo="{!hospitalToUpdate}"
                                                 name="hospitalToUpdate"
-                                                value="{!hospitalRecord.ExternalId__c}"/>
+                                                value="{!hospitalRecord.hospitalId}"/>
                                 </apex:commandLink>
                             </apex:column>
-                            <apex:column value="{!hospitalRecord.Name}"/>
-                            <apex:column value="{!hospitalRecord.Address__c}"/>
+                            <apex:column headerValue="{!$Label.Name}" value="{!hospitalRecord.name}"/>
+                            <apex:column headerValue="{!$Label.Address}" value="{!hospitalRecord.address}"/>
+                            <apex:column headerValue="{!$Label.IOrg}">
+                                <apex:inputCheckbox value="{!hospitalRecord.IOrg}" disabled="true"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.IIOrg}">
+                                <apex:inputCheckbox value="{!hospitalRecord.IIOrg}" disabled="true"/>
+                            </apex:column>
                         </apex:pageBlockTable>
                     </apex:pageBlockSectionItem>
                 </apex:pageBlockSection>
@@ -131,7 +137,7 @@
         <apex:include pageName="REST_CreateHospital" id="REST_CreateHospital"/>
     </apex:outputPanel>
     <apex:outputPanel id="updateHospitalPanel">
-        <apex:include pageName="HOSP_SoapUpdateDoctor" id="HOSP_SoapUpdateDoctor"/>
+        <apex:include pageName="REST_UpdateHospital" id="REST_UpdateHospital"/>
     </apex:outputPanel>
     <apex:outputPanel id="deleteConfirmationPanel">
         <apex:form>

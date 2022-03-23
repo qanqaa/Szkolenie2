@@ -1,6 +1,6 @@
 public with sharing class REST_Callouts {
 
-    private static final String endpoint = 'callout:IIORG';
+    private static final String endpoint = 'callout:IIORG/apexrest/Hospital__c';
     private static final String accessTokenURL = 'https://login.salesforce.com/services/oauth2/token';
     private static String accessToken {get; set;}
 

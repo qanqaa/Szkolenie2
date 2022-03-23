@@ -108,7 +108,6 @@ global class REST_RequestService {
         return hospitalsIds;
     }
 
-
     public static List<Hospital__c> getHospitals(List<Id> externalHospitalsIds) {
         List<Hospital__c> hospitals = new List<Hospital__c>();
         hospitals = [SELECT Id, Name, Address__c FROM Hospital__c WHERE Id IN :externalHospitalsIds];
