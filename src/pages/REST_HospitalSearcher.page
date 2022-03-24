@@ -9,7 +9,7 @@
     <apex:slds/>
     <div class="slds-scope">
         <apex:form id="theForm">
-            <div class="slds-page-header">
+            <div class="slds-page-header" style="margin-bottom:10px">
                 <div class="slds-page-header__row">
                     <div class="slds-page-header__col-title">
                         <div class="slds-media">
@@ -48,6 +48,7 @@
                     </div>
                 </div>
             </div>
+
             <apex:pageBlock id="hospitalSearcherPageBlock">
                 <apex:pageBlockSection>
                     <apex:pageBlockSectionItem>
@@ -66,7 +67,7 @@
                         <apex:commandButton status="spinner" styleClass="slds-button slds-button--brand"
                                             action="{!searchHospitals}"
                                             value="{!$Label.Search}"
-                                            rerender="theForm"
+                                            rerender="hospitalSearcherPageBlock"
                                             style="float: right; width: 120px; margin: 10px 0;"/>
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
@@ -74,7 +75,7 @@
                             <apex:commandButton styleClass="slds-button slds-button--neutral" action="{!clearResults}"
                                                 value="{!$Label.Clear}" status="spinner"
                                                 disabled="{!IF(hospitalsTableWrapper.size!=null, false, true)}"
-                                                rerender="theForm" immediate="true"
+                                                rerender="hospitalSearcherPageBlock" immediate="true"
                                                 style="float: left; width: 120px; margin: 10px 0;"/>
                         </apex:actionRegion>
                     </apex:pageBlockSectionItem>
@@ -85,26 +86,32 @@
                                 {!$Label.Hospitals}
                         </span>
                     </h1>
-                    <p>Items: {!IF(hospitalsTableWrapper.size!=null, hospitalsTableWrapper.size, '0')}</p>
-                    <p>{!IF(hospitalsTableWrapper.size!=null,'', $Label.NoHospitalsToDisplay)}</p>
+
+                    <p>Items: {!IF(AND(NOT(ISBLANK(hospitalsTableWrapper)),hospitalsTableWrapper.size>0),hospitalsTableWrapper.size,'0')}</p>
+                    <p>{!IF(AND(NOT(ISBLANK(hospitalsTableWrapper)),hospitalsTableWrapper.size>0),'',$Label.NoHospitalsToDisplay)}</p>
                 </apex:pageBlockSection>
-                <apex:pageBlockSection columns="1" id="hospitalsFound" rendered="{!IF(hospitalsTableWrapper.size!=null, true, false)}">
+                <apex:pageBlockSection columns="1" id="hospitalsFound" rendered="{!IF(AND(NOT(ISBLANK(hospitalsTableWrapper)),hospitalsTableWrapper.size>0),true,false)}">
                     <apex:pageBlockSectionItem>
                         <apex:pageBlockTable id="hospitalsRecords"
                                              styleClass="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
                                              value="{!hospitalsTableWrapper}" var="hospitalRecord">
                             <apex:column style="width: 10%" headerValue="{!$Label.Action}">
                                 <apex:commandLink onClick="openDeleteConfirmationModal();" value="{!$Label.Delete}"
-                                                  rerender="theForm">
-                                    <apex:param assignTo="{!hospitalToDelete}" name="hospitalToDelete"
+                                                  rerender="hospitalSearcherPageBlock, hospitalsRecords">
+                                    <apex:param assignTo="{!hospitalIdToDelete}" name="hospitalIdToDelete"
                                                 value="{!hospitalRecord.hospitalId}"/>
+                                    <apex:param assignTo="{!hospitalToDeleteExternal}" name="hospitalToDeleteExternal"
+                                                value="{!hospitalRecord.externalId}"/>
                                 </apex:commandLink>
                                 <apex:commandLink action="{!readHospitalRecord}" value="{!$Label.Update}"
                                                   onComplete="openHospitalUpdateModal();"
                                                   reRender="updateForm" style="margin-left: 10px;">
-                                    <apex:param assignTo="{!hospitalToUpdate}"
+                                    <apex:param assignTo="{!hospitalIdToUpdate}"
                                                 name="hospitalToUpdate"
                                                 value="{!hospitalRecord.hospitalId}"/>
+                                    <apex:param assignTo="{!hospitalIdToUpdateExternal}"
+                                                name="hospitalToUpdateExternal"
+                                                value="{!hospitalRecord.externalId}"/>
                                 </apex:commandLink>
                             </apex:column>
                             <apex:column headerValue="{!$Label.Name}" value="{!hospitalRecord.name}"/>
@@ -157,7 +164,7 @@
                                             reRender="editForm" immediate="true"
                                             onClick="closeDeleteConfirmationModal(); return false;"/>
                         <apex:commandButton value="{!$Label.Delete}" styleClass="slds-button slds-button_brand"
-                                            action="{!deleteHospital}" rerender="theForm" status="spinner"
+                                            action="{!deleteHospital}" rerender="hospitalSearcherPageBlock" status="spinner"
                                             onComplete="closeDeleteConfirmationModal(); return false;"/>
                     </div>
                 </div>
@@ -165,11 +172,38 @@
         </apex:form>
         <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
     </apex:outputPanel>
+    <apex:outputPanel id="toastMsg">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                 class="slds-modal slds-fade-in-open">
+        <div class="demo-only" style="height: 4rem; z-index: 1002;" id='ToastMessage'>
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
+                    <span class="slds-assistive-text">success</span>
+                    <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#success')}" />
+                    </svg>
+                </span>
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small ">Account <a href="javascript:void(0);">ACME - 100</a> widgets was created.</h2>
+                    </div>
+                    <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close" onclick='closeToastMsg()'>
+                        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                        </svg>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        </section>
+    </apex:outputPanel>
     <script>
         j$ = jQuery.noConflict();
         j$('[id$=addHospitalPanel]').addClass('hide-modal');
         j$('[id$=updateHospitalPanel]').addClass('hide-modal');
         j$('[id$=deleteConfirmationPanel]').addClass('hide-modal');
+        j$('[id$=toastMsg]').addClass('hide-modal');
 
         function openAddHospitalModal() {
             j$('[id$=addHospitalPanel]').removeClass('hide-modal');
@@ -198,6 +232,14 @@
 
         function closeDeleteConfirmationModal() {
             j$('[id$=deleteConfirmationPanel]').addClass('hide-modal');
+        }
+
+        function openToastMsg() {
+            j$('[id$=toastMsg]').removeClass('hide-modal');
+        }
+
+        function closeToastMsg() {
+            j$('[id$=toastMsg]').addClass('hide-modal');
         }
 
     </script>

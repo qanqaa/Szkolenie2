@@ -8,9 +8,13 @@ global class REST_RequestController {
     }
 
     @HttpGet
-    global static List<REST_SyncRequest> readHospitalsByParameters() {
+    global static List<REST_HospitalDTO> readHospitalsByParameters() {
         String body = RestContext.request.requestBody.toString();
-        return REST_RequestService.readHospitalsByParameters(body);
+        RestRequest hospitalRequest = RestContext.request;
+        Map<String,String> hospitalRequestParams = hospitalRequest.params;
+        String hospitalName = hospitalRequestParams.get('name');
+        String hospitalAddress = hospitalRequestParams.get('address');
+        return REST_RequestService.readHospitalsByParameters(hospitalName, hospitalAddress);
     }
 
     @HttpPatch

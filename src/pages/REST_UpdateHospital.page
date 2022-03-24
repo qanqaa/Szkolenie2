@@ -39,7 +39,7 @@
                     <div class="slds-modal__footer">
                         <apex:commandButton value="{!$Label.Save}" styleClass="slds-button slds-button_brand"
                                             action="{!updateHospitals}" onComplete="closeHospitalUpdateModal({!shouldCloseUpdateHospitalModal}); return false;"
-                                            reRender="theForm, modal-content-id-1, updatePageMsg"
+                                            reRender="hospitalsRecords, modal-content-id-1, updatePageMsg"
                                             status="spinner"/>
                         <apex:commandButton value="{!$Label.Close}" styleClass="slds-button slds-button_outline-brand"
                                             action="{!clearHospital}"

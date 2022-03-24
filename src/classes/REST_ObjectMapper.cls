@@ -15,7 +15,24 @@ public class REST_ObjectMapper {
                 hospitals.add(hospital);
             }
         } catch (Exception e) {
-            System.debug(e.getMessage());
+            return null;
+        }
+        return hospitals;
+    }
+
+    public static List<Hospital__c> mapToHospitalsFrom2Org(List<REST_HospitalDTO> hospitalsDTO) {
+        List<Hospital__c> hospitals = new List<Hospital__c>();
+        try {
+            for (REST_HospitalDTO hospitalDTO : hospitalsDTO) {
+                Hospital__c hospital = new Hospital__c(
+                        Id = hospitalDTO.externalId,
+                        Name = hospitalDTO.name,
+                        Address__c = hospitalDTO.address,
+                        ExternalId__c = hospitalDTO.hospitalId);
+                hospitals.add(hospital);
+                System.debug('hospitals >>>>>>>>>>> ' + hospitals);
+            }
+        } catch (Exception e) {
             return null;
         }
         return hospitals;
@@ -30,12 +47,10 @@ public class REST_ObjectMapper {
             }
 
         } catch (Exception e) {
-            System.debug(e.getMessage());
             return null;
         }
         return hospitalsDTO;
     }
-
 
     public static List<REST_SyncRequest> mapToSyncRequests(String operationType, List<REST_HospitalDTO> hospitalsDTO, String status) {
         List<REST_SyncRequest> recordsToSync = new List<REST_SyncRequest>();
@@ -45,7 +60,6 @@ public class REST_ObjectMapper {
                 recordsToSync.add(syncRequest);
             }
         } catch (Exception e) {
-            System.debug(e.getMessage());
             return null;
         }
         return recordsToSync;
@@ -66,12 +80,22 @@ public class REST_ObjectMapper {
                         ExternalId__c = hospitalDTO.hospitalId);
                 hospitals.add(hospital);
             }
-            System.debug('mapowanie z sync do hospitala: ' + hospitals);
         } catch (Exception e) {
-            System.debug(e.getMessage());
             return null;
         }
         return hospitals;
     }
 
+    public static Hospital__c mapFromHospitalTableWrapperToHospital(REST_HospitalTableWrapper hospitalTableWrapper) {
+        try {
+            Hospital__c hospital = new Hospital__c(
+                    Id = hospitalTableWrapper.hospitalId,
+                    Name = hospitalTableWrapper.name,
+                    Address__c = hospitalTableWrapper.address,
+                    ExternalId__c = hospitalTableWrapper.externalId);
+            return hospital;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
