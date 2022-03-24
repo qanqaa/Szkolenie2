@@ -100,7 +100,7 @@
                                                   rerender="hospitalSearcherPageBlock, hospitalsRecords">
                                     <apex:param assignTo="{!hospitalIdToDelete}" name="hospitalIdToDelete"
                                                 value="{!hospitalRecord.hospitalId}"/>
-                                    <apex:param assignTo="{!hospitalToDeleteExternal}" name="hospitalToDeleteExternal"
+                                    <apex:param assignTo="{!hospitalIdToDeleteExternal}" name="hospitalIdToDeleteExternal"
                                                 value="{!hospitalRecord.externalId}"/>
                                 </apex:commandLink>
                                 <apex:commandLink action="{!readHospitalRecord}" value="{!$Label.Update}"

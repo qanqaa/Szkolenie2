@@ -11,6 +11,12 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
         hospitalsDTO = REST_ObjectMapper.mapToHospitalsDTO(hospitals);
     }
 
+    public REST_CalloutExecutor(String operationType, List<REST_HospitalDTO> hospitalsDTO){
+        this.operationType = operationType;
+        this.hospitals = hospitals;
+        this.hospitalsDTO = hospitalsDTO;
+    }
+
     public void execute(QueueableContext context) {
         if (operationType == REST_OperationType.INSERT_RECORD.name()) {
                 Http http = new Http();

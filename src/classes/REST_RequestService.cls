@@ -110,6 +110,7 @@ global class REST_RequestService {
         for(REST_HospitalDTO hospitalDTO : hospitalsDTOIds){
             hospitalsIds.add(hospitalDTO.externalId);
         }
+        System.debug('hospitalsIds ' + hospitalsIds);
         return hospitalsIds;
     }
 

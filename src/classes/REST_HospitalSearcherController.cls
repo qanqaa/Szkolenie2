@@ -6,6 +6,7 @@ public with sharing class REST_HospitalSearcherController {
     public Hospital__c newHospital { get; set; }
     public Hospital__c updateHospital { get; set; }
     public Hospital__c deleteHospital { get; set; }
+    public REST_HospitalDTO deleteHospitalDTO { get; set; }
     public String hospitalIdToUpdate { get; set; }
     public String hospitalIdToUpdateExternal { get; set; }
     public String hospitalIdToDelete { get; set; }
@@ -101,6 +102,7 @@ public with sharing class REST_HospitalSearcherController {
 
     public void deleteHospital() {
         System.debug('hospitalIdToDelete.length(): '+  hospitalIdToDelete.length());
+        System.debug('hospitalIdToDeleteExternal.length(): '+  hospitalIdToDeleteExternal.length());
         if (hospitalIdToDelete.length() > 0) {
             for (REST_HospitalTableWrapper hospitalTableWrapper : hospitalsTableWrapper) {
                 if (hospitalTableWrapper.hospitalId == hospitalIdToDelete) {
@@ -119,14 +121,16 @@ public with sharing class REST_HospitalSearcherController {
         } else {
             for (REST_HospitalTableWrapper hospitalTableWrapper : hospitalsTableWrapper) {
                 if (hospitalTableWrapper.externalId == hospitalIdToDeleteExternal) {
-                    deleteHospital.Id = hospitalTableWrapper.hospitalId;
+                    System.debug(hospitalTableWrapper.externalId);
+                    deleteHospital.ExternalId__c = hospitalTableWrapper.externalId;
+//                    deleteHospitalDTO.externalId = hospitalTableWrapper.externalId;
                     break;
                 }
             }
-            List<Hospital__c> hospitalsToDelete = new List<Hospital__c>();
-            hospitalsToDelete.add(deleteHospital);
-            System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.DELETE_RECORD.name(), hospitalsToDelete));
-            searchHospitals();
+            deleteHospitalDTO = new REST_HospitalDTO(deleteHospital);
+            List<REST_HospitalDTO> hospitalsToDeleteDTO = new List<REST_HospitalDTO>();
+            hospitalsToDeleteDTO.add(deleteHospitalDTO);
+            System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.DELETE_RECORD.name(), hospitalsToDeleteDTO));
         }
     }
 
