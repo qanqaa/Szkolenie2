@@ -165,7 +165,7 @@
                                             onClick="closeDeleteConfirmationModal(); return false;"/>
                         <apex:commandButton value="{!$Label.Delete}" styleClass="slds-button slds-button_brand"
                                             action="{!deleteHospital}" rerender="hospitalSearcherPageBlock" status="spinner"
-                                            onComplete="closeDeleteConfirmationModal(); return false;"/>
+                                            onComplete="openToastMsg(); closeDeleteConfirmationModal(); return false;"/>
                     </div>
                 </div>
             </section>
@@ -234,11 +234,11 @@
             j$('[id$=deleteConfirmationPanel]').addClass('hide-modal');
         }
 
-        function openToastMsg() {
+        function openToastMsg(message) {
             j$('[id$=toastMsg]').removeClass('hide-modal');
         }
 
-        function closeToastMsg() {
+        function closeToastMsg(message) {
             j$('[id$=toastMsg]').addClass('hide-modal');
         }
 

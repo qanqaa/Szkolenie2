@@ -36,7 +36,6 @@ global class REST_RequestService {
             queriedHospitalsDTO.add(new REST_HospitalDTO(queriedHospital));
         }
         return queriedHospitalsDTO;
-
     }
 
     public static List<REST_SyncRequest> updateHospitals(String body) {
@@ -81,11 +80,14 @@ global class REST_RequestService {
 
     public static List<REST_SyncRequest> deleteHospitals(String body) {
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
+        System.debug('BODY: ' + body);
         try {
             List<REST_HospitalDTO> hospitalsDTOIds = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
-
+            System.debug('hospitalsDTOIds: ' + hospitalsDTOIds);
             List<Id> hospitalsIds = getIds(hospitalsDTOIds);
+            System.debug('hospitalsIds: ' + hospitalsIds);
             List<Hospital__c> hospitals = getHospitals(hospitalsIds);
+            System.debug('hospitals: ' + hospitals);
             if (hospitals.isEmpty()) {
                 syncRequests.add(new REST_SyncRequest(REST_OperationType.DELETE_RECORD.name(), null, 'No records found with specified ID.'));
                 return syncRequests;
@@ -110,7 +112,6 @@ global class REST_RequestService {
         for(REST_HospitalDTO hospitalDTO : hospitalsDTOIds){
             hospitalsIds.add(hospitalDTO.externalId);
         }
-        System.debug('hospitalsIds ' + hospitalsIds);
         return hospitalsIds;
     }
 

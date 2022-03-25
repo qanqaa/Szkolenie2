@@ -24,13 +24,14 @@ public class REST_ObjectMapper {
         List<Hospital__c> hospitals = new List<Hospital__c>();
         try {
             for (REST_HospitalDTO hospitalDTO : hospitalsDTO) {
-                Hospital__c hospital = new Hospital__c(
-                        Id = hospitalDTO.externalId,
-                        Name = hospitalDTO.name,
-                        Address__c = hospitalDTO.address,
-                        ExternalId__c = hospitalDTO.hospitalId);
+                Hospital__c hospital = new Hospital__c();
+                if(hospitalDTO.externalId != null){
+                    hospital.Id = hospitalDTO.externalId;
+                }
+                hospital.Name = hospitalDTO.name;
+                hospital.Address__c = hospitalDTO.address;
+                hospital.ExternalId__c = hospitalDTO.hospitalID;
                 hospitals.add(hospital);
-                System.debug('hospitals >>>>>>>>>>> ' + hospitals);
             }
         } catch (Exception e) {
             return null;

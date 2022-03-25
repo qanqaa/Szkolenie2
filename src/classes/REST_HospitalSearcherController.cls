@@ -53,12 +53,15 @@ public with sharing class REST_HospitalSearcherController {
             List<Hospital__c> hospitalsFrom2ndOrg = REST_ObjectMapper.mapToHospitalsFrom2Org(hospitalsDTOFrom2ndOrg);
             List<Hospital__c> allHospitals = new List<Hospital__c>();
             allHospitals.addAll(hospitalsFromOrg);
+            System.debug('allHospitals: ' + allHospitals);
             for (Hospital__c hospitalFrom2ndOrg : hospitalsFrom2ndOrg) {
                 if (!allHospitals.contains(hospitalFrom2ndOrg)) {
                     allHospitals.add(hospitalFrom2ndOrg);
+                    System.debug('hospitalFrom2ndOrg: ' + hospitalFrom2ndOrg);
                 }
             }
             createHospitalTableWrapperList(allHospitals);
+            System.debug(hospitalsTableWrapper);
         } catch (Exception e) {
             clearResults();
             displayInfoMessage(e.getMessage());
@@ -123,7 +126,6 @@ public with sharing class REST_HospitalSearcherController {
                 if (hospitalTableWrapper.externalId == hospitalIdToDeleteExternal) {
                     System.debug(hospitalTableWrapper.externalId);
                     deleteHospital.ExternalId__c = hospitalTableWrapper.externalId;
-//                    deleteHospitalDTO.externalId = hospitalTableWrapper.externalId;
                     break;
                 }
             }
