@@ -15,6 +15,23 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
         System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.INSERT_RECORD.name(), this.newList));
     }
 
+    protected override void beforeUpdate() {
+        for (Hospital__c hosp: newList) {
+//Here we use the account id, to get the older version of record.
+            Hospital__c oldHospital = oldMap.get(hosp.Id);
+
+//once we get the older version, we can get any field's value from older version to compare.
+            if(hosp.Name == oldHospital.Name && hosp.Address__c == oldHospital.Address__c) {
+                HOSP_TriggerUtilities.runTrigger = false;
+//Here is some logic being performed on a condition basis.
+                System.debug('--*Account Number NOT  changed*--');
+            }
+            else{
+                System.debug('--**Account Number has been Updated**--');
+            }
+        }
+    }
+
     protected override void afterUpdate() {
         System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
     }

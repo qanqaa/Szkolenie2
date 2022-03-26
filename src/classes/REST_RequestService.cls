@@ -61,12 +61,15 @@ global class REST_RequestService {
             }
             for (Hospital__c hospital : hospitals) {
                 REST_HospitalDTO newHospitalData = hospitalsToUpdate.get(hospital.Id);
+                if(newHospitalData.name != null && newHospitalData.name != hospital.Name){
+
+                }
                 hospital.Name = newHospitalData.name != null ? newHospitalData.name : hospital.Name;
                 hospital.Address__c = newHospitalData.address != null ? newHospitalData.address : hospital.Address__c;
             }
             System.debug(hospitals);
-            Database.SaveResult[] saveResults = Database.update(hospitals, false);
             HOSP_TriggerUtilities.runTrigger = false;
+            Database.SaveResult[] saveResults = Database.update(hospitals, false);
             String[] saveResultsMsg = decodeDatabaseSaveResults(saveResults);
             for (Integer i = 0; i < saveResultsMsg.size(); i++) {
                 REST_HospitalDTO hospitalDTO = new REST_HospitalDTO(hospitals.get(i));
