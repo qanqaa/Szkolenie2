@@ -66,6 +66,7 @@ global class REST_RequestService {
             }
             System.debug(hospitals);
             Database.SaveResult[] saveResults = Database.update(hospitals, false);
+            HOSP_TriggerUtilities.runTrigger = false;
             String[] saveResultsMsg = decodeDatabaseSaveResults(saveResults);
             for (Integer i = 0; i < saveResultsMsg.size(); i++) {
                 REST_HospitalDTO hospitalDTO = new REST_HospitalDTO(hospitals.get(i));

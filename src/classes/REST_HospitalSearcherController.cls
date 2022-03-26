@@ -14,6 +14,7 @@ public with sharing class REST_HospitalSearcherController {
     public Boolean shouldCloseAddHospitalModal { get; set; }
     public Boolean shouldCloseUpdateHospitalModal { get; set; }
     public REST_HospitalDTO hospitalDTO { get; set; }
+    public Boolean shouldDisplayToastMsg { get; set; }
 
     public REST_HospitalSearcherController() {
         this.hospital = new Hospital__c();
@@ -22,6 +23,7 @@ public with sharing class REST_HospitalSearcherController {
         this.deleteHospital = new Hospital__c();
         this.shouldCloseAddHospitalModal = false;
         this.shouldCloseUpdateHospitalModal = false;
+        this.shouldDisplayToastMsg = false;
     }
 
     public void saveHospital() {
@@ -32,6 +34,8 @@ public with sharing class REST_HospitalSearcherController {
         Database.SaveResult saveResult = Database.insert(hospitalToSave);
         if (saveResult.isSuccess()) {
             shouldCloseAddHospitalModal = true;
+            shouldDisplayToastMsg = true;
+            displayInfoMessage('Success!');
         } else {
             for (Database.Error err : saveResult.getErrors()) {
                 displayInfoMessage(err.getStatusCode() + ': ' + err.getMessage());
@@ -70,6 +74,7 @@ public with sharing class REST_HospitalSearcherController {
 
     public void readHospitalRecord() {
         shouldCloseUpdateHospitalModal = false;
+        shouldDisplayToastMsg = false;
         if (hospitalIdToUpdate.length() > 0) {
             for (REST_HospitalTableWrapper hospitalTableWrapper : hospitalsTableWrapper) {
                 if (hospitalTableWrapper.hospitalId == hospitalIdToUpdate) {
@@ -88,8 +93,12 @@ public with sharing class REST_HospitalSearcherController {
     public void updateHospitals() {
         if (hospitalIdToUpdate.length() > 0) {
             Database.SaveResult saveResult = Database.update(updateHospital);
+            HOSP_TriggerUtilities.runTrigger = false;
+
             if (saveResult.isSuccess()) {
                 shouldCloseUpdateHospitalModal = true;
+                shouldDisplayToastMsg = true;
+
             } else {
                 for (Database.Error err : saveResult.getErrors()) {
                     displayInfoMessage(err.getStatusCode() + ': ' + err.getMessage());
@@ -99,11 +108,13 @@ public with sharing class REST_HospitalSearcherController {
             List<Hospital__c> tmpListToUpdate = new List<Hospital__c>();
             tmpListToUpdate.add(updateHospital);
             System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), tmpListToUpdate));
+            HOSP_TriggerUtilities.runTrigger = false;
             shouldCloseUpdateHospitalModal = true;
+            shouldDisplayToastMsg = true;
         }
     }
 
-    public void deleteHospital() {
+    public void deleteHospitals() {
         System.debug('hospitalIdToDelete.length(): '+  hospitalIdToDelete.length());
         System.debug('hospitalIdToDeleteExternal.length(): '+  hospitalIdToDeleteExternal.length());
         if (hospitalIdToDelete.length() > 0) {
@@ -199,6 +210,7 @@ public with sharing class REST_HospitalSearcherController {
         try {
             newHospital.clear();
             shouldCloseAddHospitalModal = false;
+            shouldDisplayToastMsg = false;
         } catch (Exception e) {
             displayInfoMessage(e.getMessage());
         }

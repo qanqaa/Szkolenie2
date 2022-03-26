@@ -38,13 +38,13 @@
                     </div>
                     <div class="slds-modal__footer">
                         <apex:commandButton value="{!$Label.Save}" styleClass="slds-button slds-button_brand"
-                                            action="{!updateHospitals}" onComplete="closeHospitalUpdateModal({!shouldCloseUpdateHospitalModal}); return false;"
+                                            action="{!updateHospitals}" onComplete="closeHospitalUpdateModal({!shouldCloseUpdateHospitalModal}, {!shouldDisplayToastMsg}); return false;"
                                             reRender="hospitalsRecords, modal-content-id-1, updatePageMsg"
                                             status="spinner"/>
                         <apex:commandButton value="{!$Label.Close}" styleClass="slds-button slds-button_outline-brand"
                                             action="{!clearHospital}"
                                             reRender="editForm" immediate="true"
-                                            onComplete="closeHospitalUpdateModal(true); return false;"/>
+                                            onComplete="closeHospitalUpdateModal(true, false); return false;"/>
                     </div>
                 </div>
             </div>

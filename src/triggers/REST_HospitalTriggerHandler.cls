@@ -16,8 +16,7 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
     }
 
     protected override void afterUpdate() {
-        //System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
-        HOSP_TriggerUtilities.runTrigger = false;
+        System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
     }
 
     protected override void afterDelete() {

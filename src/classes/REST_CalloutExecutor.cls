@@ -36,6 +36,7 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
             List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
                     List<REST_SyncRequest>.class);
             HOSP_TriggerUtilities.runTrigger = false;
+            System.debug('runTrigger: ' + HOSP_TriggerUtilities.runTrigger);
 
         } else if (operationType == REST_OperationType.DELETE_RECORD.name()) {
             Http http = new Http();
@@ -44,7 +45,6 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
             HttpResponse response = http.send(request);
             List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
                     List<REST_SyncRequest>.class);
-            HOSP_TriggerUtilities.runTrigger = false;
         }
     }
 }
