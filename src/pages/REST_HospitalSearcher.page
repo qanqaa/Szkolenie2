@@ -199,7 +199,7 @@
                 j$('[id$=addHospitalPanel]').addClass('hide-modal');
                 if(shouldDisplayToastMsg){
                     toastLaunch();
-                    let timeout = setTimeout(toastLaunch, 3000);
+                    let timeout = setTimeout(toastLaunch, 6000);
                 }
             }
         }
@@ -213,7 +213,7 @@
                 j$('[id$=updateHospitalPanel]').addClass('hide-modal');
                 if(shouldDisplayToastMsg){
                     toastLaunch();
-                    let timeout = setTimeout(toastLaunch, 3000);
+                    let timeout = setTimeout(toastLaunch, 6000);
                 }
             }
         }
@@ -226,7 +226,7 @@
             j$('[id$=deleteConfirmationPanel]').addClass('hide-modal');
              if(shouldDisplayToastMsg){
                 toastLaunch();
-                let timeout = setTimeout(toastLaunch, 3000);
+                let timeout = setTimeout(toastLaunch, 6000);
              }
         }
 

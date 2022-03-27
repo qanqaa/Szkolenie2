@@ -2,15 +2,12 @@ global class REST_RequestService {
 
     public static List<REST_SyncRequest> insertHospitals(String body) {
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
-        System.debug('BODY:' + body);
         if (body == null || body == '') {
             syncRequests.add(new REST_SyncRequest(REST_OperationType.READ_RECORD.name(), null, 'Received empty or null request.'));
             return syncRequests;
         }
         List<REST_HospitalDTO> hospitalsDTO = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
-        System.debug('hospitalsDTO:' + hospitalsDTO);
         List<Hospital__c> hospitals = REST_ObjectMapper.mapToHospitalsFrom2Org(hospitalsDTO);
-        System.debug('hospitals:' + hospitals);
         Database.SaveResult[] saveResults = Database.insert(hospitals, false);
         String[] saveResultsMsg = decodeDatabaseSaveResults(saveResults);
         for (Integer i = 0; i < saveResultsMsg.size(); i++) {
@@ -29,7 +26,6 @@ global class REST_RequestService {
         }
         hospitalName  = hospitalName.replace('%20',' ');
         hospitalAddress = hospitalAddress.replace('%20',' ');
-        System.debug(createQuery(hospitalName,hospitalAddress));
         List<Hospital__c> queriedHospitals = Database.query(createQuery(hospitalName,hospitalAddress));
         List<REST_HospitalDTO> queriedHospitalsDTO = new List<REST_HospitalDTO>();
         for (Hospital__c queriedHospital : queriedHospitals) {
@@ -43,12 +39,9 @@ global class REST_RequestService {
         List<Hospital__c> hospitals = new List<Hospital__c>();
         try {
             List<REST_HospitalDTO> hospitalsDTO = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
-            System.debug(hospitalsDTO);
-            //ZAMIENIC ID Z EXTERNAL ID
-
             List<Id> hospitalsId = new List<Id>();
             for (REST_HospitalDTO hospitalDTO : hospitalsDTO) {
-                hospitalsId.add(hospitalDTO.externalId); // LISTA ID Z BIEZACEGO SYSTEMU
+                hospitalsId.add(hospitalDTO.externalId);
             }
             hospitals = getHospitals(hospitalsId);
             if (hospitals.isEmpty()) {
@@ -67,7 +60,6 @@ global class REST_RequestService {
                 hospital.Name = newHospitalData.name != null ? newHospitalData.name : hospital.Name;
                 hospital.Address__c = newHospitalData.address != null ? newHospitalData.address : hospital.Address__c;
             }
-            System.debug(hospitals);
             HOSP_TriggerUtilities.runTrigger = false;
             Database.SaveResult[] saveResults = Database.update(hospitals, false);
             String[] saveResultsMsg = decodeDatabaseSaveResults(saveResults);
@@ -84,14 +76,10 @@ global class REST_RequestService {
 
     public static List<REST_SyncRequest> deleteHospitals(String body) {
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
-        System.debug('BODY: ' + body);
         try {
             List<REST_HospitalDTO> hospitalsDTOIds = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
-            System.debug('hospitalsDTOIds: ' + hospitalsDTOIds);
             List<Id> hospitalsIds = getIds(hospitalsDTOIds);
-            System.debug('hospitalsIds: ' + hospitalsIds);
             List<Hospital__c> hospitals = getHospitals(hospitalsIds);
-            System.debug('hospitals: ' + hospitals);
             if (hospitals.isEmpty()) {
                 syncRequests.add(new REST_SyncRequest(REST_OperationType.DELETE_RECORD.name(), null, 'No records found with specified ID.'));
                 return syncRequests;
@@ -121,7 +109,11 @@ global class REST_RequestService {
 
     public static List<Hospital__c> getHospitals(List<Id> externalHospitalsIds) {
         List<Hospital__c> hospitals = new List<Hospital__c>();
-        hospitals = [SELECT Id, Name, Address__c, ExternalId__c FROM Hospital__c WHERE Id IN :externalHospitalsIds];
+        hospitals = [
+                SELECT Id, Name, Address__c, ExternalId__c
+                FROM Hospital__c
+                WHERE Id IN :externalHospitalsIds
+        ];
         return hospitals;
     }
 
@@ -171,7 +163,6 @@ global class REST_RequestService {
         }
         if (string.isNotEmpty(hospitalName)) {
             searchQuery += 'Name LIKE \'%' + hospitalName + '%\'';
-            System.debug(searchQuery);
             return searchQuery;
         }
         if(string.isNotEmpty(hospitalName) && string.isNotEmpty(hospitalAddress)){

@@ -35,7 +35,6 @@ public with sharing class REST_HospitalSearcherController {
         if (saveResult.isSuccess()) {
             shouldCloseAddHospitalModal = true;
             shouldDisplayToastMsg = true;
-            displayInfoMessage('Success!');
         } else {
             for (Database.Error err : saveResult.getErrors()) {
                 displayInfoMessage(err.getStatusCode() + ': ' + err.getMessage());
@@ -57,15 +56,12 @@ public with sharing class REST_HospitalSearcherController {
             List<Hospital__c> hospitalsFrom2ndOrg = REST_ObjectMapper.mapToHospitalsFrom2Org(hospitalsDTOFrom2ndOrg);
             List<Hospital__c> allHospitals = new List<Hospital__c>();
             allHospitals.addAll(hospitalsFromOrg);
-            System.debug('allHospitals: ' + allHospitals);
             for (Hospital__c hospitalFrom2ndOrg : hospitalsFrom2ndOrg) {
                 if (!allHospitals.contains(hospitalFrom2ndOrg)) {
                     allHospitals.add(hospitalFrom2ndOrg);
-                    System.debug('hospitalFrom2ndOrg: ' + hospitalFrom2ndOrg);
                 }
             }
             createHospitalTableWrapperList(allHospitals);
-            System.debug(hospitalsTableWrapper);
         } catch (Exception e) {
             clearResults();
             displayInfoMessage(e.getMessage());
@@ -115,27 +111,21 @@ public with sharing class REST_HospitalSearcherController {
     }
 
     public void deleteHospitals() {
-        System.debug('hospitalIdToDelete.length(): '+  hospitalIdToDelete.length());
-        System.debug('hospitalIdToDeleteExternal.length(): '+  hospitalIdToDeleteExternal.length());
         if (hospitalIdToDelete.length() > 0) {
             for (REST_HospitalTableWrapper hospitalTableWrapper : hospitalsTableWrapper) {
                 if (hospitalTableWrapper.hospitalId == hospitalIdToDelete) {
-                    System.debug('hospitalIdToDelete '+  hospitalIdToDelete);
                     deleteHospital.Id = hospitalTableWrapper.hospitalId;
                     break;
                 }
             }
             try {
                 Database.DeleteResult dr = Database.delete(deleteHospital);
-                System.debug(dr);
             } catch (Exception e) {
-                System.debug(e);
                 displayInfoMessage(e.getMessage());
             }
         } else {
             for (REST_HospitalTableWrapper hospitalTableWrapper : hospitalsTableWrapper) {
                 if (hospitalTableWrapper.externalId == hospitalIdToDeleteExternal) {
-                    System.debug(hospitalTableWrapper.externalId);
                     deleteHospital.ExternalId__c = hospitalTableWrapper.externalId;
                     break;
                 }

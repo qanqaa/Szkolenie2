@@ -25,7 +25,6 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
                 List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
                         List<REST_SyncRequest>.class);
                 List<Hospital__c> syncedHospitals = REST_ObjectMapper.mapFromSyncRequestsToHospitals(syncRequests);
-                System.debug('ZWROCONE: ' + syncedHospitals);
                 HOSP_TriggerUtilities.runTrigger = false;
                 update syncedHospitals;
 
@@ -36,12 +35,10 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
             List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
                     List<REST_SyncRequest>.class);
             HOSP_TriggerUtilities.runTrigger = false;
-            System.debug('runTrigger: ' + HOSP_TriggerUtilities.runTrigger);
 
         } else if (operationType == REST_OperationType.DELETE_RECORD.name()) {
             Http http = new Http();
             HttpRequest request = REST_Callouts.prepareDeleteHospitalsRequest(hospitalsDTO);
-            System.debug('hospitalsDTO: ' + hospitalsDTO);
             HttpResponse response = http.send(request);
             List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
                     List<REST_SyncRequest>.class);
