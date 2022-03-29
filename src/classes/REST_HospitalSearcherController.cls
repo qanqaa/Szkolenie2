@@ -62,7 +62,6 @@ public with sharing class REST_HospitalSearcherController {
             }
             createHospitalTableWrapperList(allHospitals);
         } catch (Exception e) {
-            System.debug('>>>>>>>' + e.getMessage());
             clearResults();
             displayInfoMessage(e.getMessage());
         }
@@ -89,7 +88,7 @@ public with sharing class REST_HospitalSearcherController {
     public void updateHospitals() {
         if (hospitalIdToUpdate.length() > 0) {
             Database.SaveResult saveResult = Database.update(updateHospital);
-            HOSP_TriggerUtilities.runTrigger = false;
+//            HOSP_TriggerUtilities.runTrigger = false;
 
             if (saveResult.isSuccess()) {
                 shouldCloseUpdateHospitalModal = true;
@@ -104,7 +103,7 @@ public with sharing class REST_HospitalSearcherController {
             List<Hospital__c> tmpListToUpdate = new List<Hospital__c>();
             tmpListToUpdate.add(updateHospital);
             System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), tmpListToUpdate));
-            HOSP_TriggerUtilities.runTrigger = false;
+//            HOSP_TriggerUtilities.runTrigger = false;
             shouldCloseUpdateHospitalModal = true;
             shouldDisplayToastMsg = true;
         }

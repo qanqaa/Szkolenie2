@@ -15,10 +15,10 @@ global class REST_RequestService {
             List<REST_HospitalDTO> hospitalsDTO = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
             for(REST_HospitalDTO hospitalDTO : hospitalsDTO){
                 if(hospitalDTO.hospitalId != null){
-                    HOSP_TriggerUtilities.runTrigger = false;
+//                    HOSP_TriggerUtilities.runTrigger = false;
                 }
                 else{
-                    HOSP_TriggerUtilities.runTrigger = true;
+//                    HOSP_TriggerUtilities.runTrigger = true;
                     break;
                 }
             }
@@ -88,7 +88,7 @@ global class REST_RequestService {
                 hospital.Name = newHospitalData.name != null ? newHospitalData.name : hospital.Name;
                 hospital.Address__c = newHospitalData.address != null ? newHospitalData.address : hospital.Address__c;
             }
-            HOSP_TriggerUtilities.runTrigger = false;
+//            HOSP_TriggerUtilities.runTrigger = false;
             Database.SaveResult[] saveResults = Database.update(hospitals, false);
             String[] saveResultsMsg = decodeDatabaseSaveResults(saveResults);
             for (Integer i = 0; i < saveResultsMsg.size(); i++) {

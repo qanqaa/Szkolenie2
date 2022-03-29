@@ -17,13 +17,33 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
         }
     }
 
+//    protected override void beforeUpdate() {
+//        for (Hospital__c hosp: newList) {
+//            Hospital__c oldHospital = oldMap.get(hosp.ExternalId__c);
+////            if(hosp.ExternalId__c != oldHospital.ExternalId__c){
+////                HOSP_TriggerUtilities.runTrigger = false;
+////            }
+////            else{
+////                HOSP_TriggerUtilities.runTrigger = true;
+////                break;
+////            }
+//
+//            if(hosp.Name == oldHospital.Name && hosp.Address__c == oldHospital.Address__c) {
+//                HOSP_TriggerUtilities.runTrigger = false;
+//            }
+//            else{
+//                HOSP_TriggerUtilities.runTrigger = true;
+//                break;
+//            }
+//        }
+//    }
+
     protected override void beforeUpdate() {
-        for (Hospital__c hosp: newList) {
+        for (Hospital__c hosp : newList) {
             Hospital__c oldHospital = oldMap.get(hosp.Id);
-            if(hosp.Name == oldHospital.Name && hosp.Address__c == oldHospital.Address__c) {
+            if (hosp.Name == oldHospital.Name && hosp.Address__c == oldHospital.Address__c) {
                 HOSP_TriggerUtilities.runTrigger = false;
-            }
-            else{
+            } else {
                 HOSP_TriggerUtilities.runTrigger = true;
                 break;
             }
@@ -32,6 +52,7 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
 
     protected override void afterUpdate() {
         if(Hospital_Trigger__c.getInstance().Is_Active__c){
+            System.debug('wchodzi w after update');
             System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
         }
     }
