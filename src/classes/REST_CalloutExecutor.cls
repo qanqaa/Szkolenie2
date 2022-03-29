@@ -11,7 +11,7 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
         hospitalsDTO = REST_ObjectMapper.mapToHospitalsDTO(hospitals);
     }
 
-    public REST_CalloutExecutor(String operationType, List<REST_HospitalDTO> hospitalsDTO){
+    public REST_CalloutExecutor(String operationType, List<REST_HospitalDTO> hospitalsDTO) {
         this.operationType = operationType;
         this.hospitals = hospitals;
         this.hospitalsDTO = hospitalsDTO;
@@ -19,14 +19,15 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
 
     public void execute(QueueableContext context) {
         if (operationType == REST_OperationType.INSERT_RECORD.name()) {
-                Http http = new Http();
-                HttpRequest request = REST_Callouts.preparePostHospitalsRequest(hospitalsDTO);
-                HttpResponse response = http.send(request);
-                List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
-                        List<REST_SyncRequest>.class);
-                List<Hospital__c> syncedHospitals = REST_ObjectMapper.mapFromSyncRequestsToHospitals(syncRequests);
-                HOSP_TriggerUtilities.runTrigger = false;
-                update syncedHospitals;
+            Http http = new Http();
+            HttpRequest request = REST_Callouts.preparePostHospitalsRequest(hospitalsDTO);
+            HttpResponse response = http.send(request);
+            List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
+                    List<REST_SyncRequest>.class);
+            List<Hospital__c> syncedHospitals = REST_ObjectMapper.mapFromSyncRequestsToHospitals(syncRequests);
+            LogBuilder.createLog('Outbound', request, response);
+            HOSP_TriggerUtilities.runTrigger = false;
+            update syncedHospitals;
 
         } else if (operationType == REST_OperationType.UPDATE_RECORD.name()) {
             Http http = new Http();
@@ -35,6 +36,7 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
             List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
                     List<REST_SyncRequest>.class);
             HOSP_TriggerUtilities.runTrigger = false;
+            LogBuilder.createLog('Outbound', request, response);
 
         } else if (operationType == REST_OperationType.DELETE_RECORD.name()) {
             Http http = new Http();
@@ -42,6 +44,8 @@ public class REST_CalloutExecutor implements Queueable, Database.AllowsCallouts 
             HttpResponse response = http.send(request);
             List<REST_SyncRequest> syncRequests = (List<REST_SyncRequest>) JSON.deserialize(response.getBody(),
                     List<REST_SyncRequest>.class);
+            HOSP_TriggerUtilities.runTrigger = false;
+            LogBuilder.createLog('Outbound', request, response);
         }
-    }
+    } 
 }

@@ -39,7 +39,7 @@
                     <div class="slds-modal__footer">
                         <apex:commandButton value="{!$Label.Save}" styleClass="slds-button slds-button_brand"
                                             action="{!saveHospital}" onComplete="closeAddHospitalModal({!shouldCloseAddHospitalModal}, {!shouldDisplayToastMsg}); return false; "
-                                            reRender="hospitalSearcherPageBlock, editForm, modal-content-id-1,editPageMsg"
+                                            reRender="editForm, modal-content-id-1,editPageMsg"
                                             status="spinner"/>
                         <apex:commandButton value="{!$Label.Close}" styleClass="slds-button slds-button_outline-brand"
                                             action="{!clearHospital}"

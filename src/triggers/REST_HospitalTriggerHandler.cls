@@ -12,7 +12,9 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
     }
 
     protected override void afterInsert() {
-        System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.INSERT_RECORD.name(), this.newList));
+        if(Hospital_Trigger__c.getInstance().Is_Active__c){
+            System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.INSERT_RECORD.name(), this.newList));
+        }
     }
 
     protected override void beforeUpdate() {
@@ -29,10 +31,14 @@ public with sharing class REST_HospitalTriggerHandler extends HOSP_TriggerHandle
     }
 
     protected override void afterUpdate() {
-        System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
+        if(Hospital_Trigger__c.getInstance().Is_Active__c){
+            System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.UPDATE_RECORD.name(), this.newList));
+        }
     }
 
     protected override void afterDelete() {
-        System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.DELETE_RECORD.name(), this.oldList));
+        if(Hospital_Trigger__c.getInstance().Is_Active__c){
+            System.enqueueJob(new REST_CalloutExecutor(REST_OperationType.DELETE_RECORD.name(), this.oldList));
+        }
     }
 }

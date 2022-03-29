@@ -52,7 +52,6 @@ public with sharing class REST_HospitalSearcherController {
             HTTPResponse response = http.send(request);
             List<REST_HospitalDTO> hospitalsDTOFrom2ndOrg = (List<REST_HospitalDTO>) JSON.deserialize(response.getBody(),
                     List<REST_HospitalDTO>.class);
-
             List<Hospital__c> hospitalsFrom2ndOrg = REST_ObjectMapper.mapToHospitalsFrom2Org(hospitalsDTOFrom2ndOrg);
             List<Hospital__c> allHospitals = new List<Hospital__c>();
             allHospitals.addAll(hospitalsFromOrg);
@@ -63,6 +62,7 @@ public with sharing class REST_HospitalSearcherController {
             }
             createHospitalTableWrapperList(allHospitals);
         } catch (Exception e) {
+            System.debug('>>>>>>>' + e.getMessage());
             clearResults();
             displayInfoMessage(e.getMessage());
         }

@@ -1,20 +1,47 @@
 global class REST_RequestService {
 
+    public static String responseBody;
+    public static Integer responseStatusCode;
+    public static String statusMessage;
+
     public static List<REST_SyncRequest> insertHospitals(String body) {
+        RestRequest request = RestContext.request;
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
-        if (body == null || body == '') {
-            syncRequests.add(new REST_SyncRequest(REST_OperationType.READ_RECORD.name(), null, 'Received empty or null request.'));
+        try{
+            if (body == null || body == '') {
+                syncRequests.add(new REST_SyncRequest(REST_OperationType.READ_RECORD.name(), null, 'Received empty or null request.'));
+                return syncRequests;
+            }
+            List<REST_HospitalDTO> hospitalsDTO = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
+            for(REST_HospitalDTO hospitalDTO : hospitalsDTO){
+                if(hospitalDTO.hospitalId != null){
+                    HOSP_TriggerUtilities.runTrigger = false;
+                }
+                else{
+                    HOSP_TriggerUtilities.runTrigger = true;
+                    break;
+                }
+            }
+            List<Hospital__c> hospitals = REST_ObjectMapper.mapToHospitalsFrom2Org(hospitalsDTO);
+            Database.SaveResult[] saveResults = Database.insert(hospitals, false);
+            String[] saveResultsMsg = decodeDatabaseSaveResults(saveResults);
+            for (Integer i = 0; i < saveResultsMsg.size(); i++) {
+                REST_HospitalDTO hospitalDTO = new REST_HospitalDTO(hospitals.get(i));
+                syncRequests.add(new REST_SyncRequest(REST_OperationType.INSERT_RECORD.name(), hospitalDTO, String.valueOf(saveResultsMsg.get(i))));
+            }
+            responseStatusCode = 200;
+            responseBody =  JSON.serialize(syncRequests);
+            LogBuilder.createLog('Inbound', request, responseStatusCode, responseBody);
             return syncRequests;
         }
-        List<REST_HospitalDTO> hospitalsDTO = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
-        List<Hospital__c> hospitals = REST_ObjectMapper.mapToHospitalsFrom2Org(hospitalsDTO);
-        Database.SaveResult[] saveResults = Database.insert(hospitals, false);
-        String[] saveResultsMsg = decodeDatabaseSaveResults(saveResults);
-        for (Integer i = 0; i < saveResultsMsg.size(); i++) {
-            REST_HospitalDTO hospitalDTO = new REST_HospitalDTO(hospitals.get(i));
-            syncRequests.add(new REST_SyncRequest(REST_OperationType.INSERT_RECORD.name(), hospitalDTO, String.valueOf(saveResultsMsg.get(i))));
+        catch (Exception e){
+            syncRequests.add(new REST_SyncRequest(REST_OperationType.INSERT_RECORD.name(), null, e.getMessage()));
+            responseStatusCode = 500;
+            responseBody =  null;
+            LogBuilder.createLog('Inbound', request, responseStatusCode, responseBody);
+            return syncRequests;
         }
-        return syncRequests;
+
     }
 
     public static List<REST_HospitalDTO> readHospitalsByParameters(String hospitalName, String hospitalAddress) {
@@ -35,6 +62,7 @@ global class REST_RequestService {
     }
 
     public static List<REST_SyncRequest> updateHospitals(String body) {
+        RestRequest request = RestContext.request;
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
         List<Hospital__c> hospitals = new List<Hospital__c>();
         try {
@@ -67,14 +95,21 @@ global class REST_RequestService {
                 REST_HospitalDTO hospitalDTO = new REST_HospitalDTO(hospitals.get(i));
                 syncRequests.add(new REST_SyncRequest(REST_OperationType.UPDATE_RECORD.name(), hospitalDTO, String.valueOf(saveResultsMsg.get(i))));
             }
+            responseStatusCode = 200;
+            responseBody =  JSON.serialize(syncRequests);
+            LogBuilder.createLog('Inbound', request, responseStatusCode, responseBody);
             return syncRequests;
         } catch (Exception e) {
             syncRequests.add(new REST_SyncRequest(REST_OperationType.UPDATE_RECORD.name(), null, e.getMessage()));
+            responseStatusCode = 500;
+            responseBody =  null;
+            LogBuilder.createLog('Inbound', request, responseStatusCode, responseBody);
             return syncRequests;
         }
     }
 
     public static List<REST_SyncRequest> deleteHospitals(String body) {
+        RestRequest request = RestContext.request;
         List<REST_SyncRequest> syncRequests = new List<REST_SyncRequest>();
         try {
             List<REST_HospitalDTO> hospitalsDTOIds = (List<REST_HospitalDTO>) JSON.deserialize(body, List<REST_HospitalDTO>.class);
@@ -84,17 +119,29 @@ global class REST_RequestService {
                 syncRequests.add(new REST_SyncRequest(REST_OperationType.DELETE_RECORD.name(), null, 'No records found with specified ID.'));
                 return syncRequests;
             }
-
+//            System.debug('hospitals.isEmpty() ' + hospitals.isEmpty());
+//            if (hospitals.isEmpty()) {
+//                HOSP_TriggerUtilities.runTrigger = false;
+//            }
+//            else{
+//                HOSP_TriggerUtilities.runTrigger = true;
+//            }
+//            System.debug('HOSP_TriggerUtilities.runTrigger '+ HOSP_TriggerUtilities.runTrigger);
             Database.DeleteResult[] deleteResults = Database.delete(hospitals, false);
             String[] deleteResultsMsg = decodeDatabaseDeleteResults(deleteResults);
-
             for (Integer i = 0; i < deleteResultsMsg.size(); i++) {
                 REST_HospitalDTO hospitalDTO = new REST_HospitalDTO(hospitals.get(i));
                 syncRequests.add(new REST_SyncRequest(REST_OperationType.DELETE_RECORD.name(), hospitalDTO, String.valueOf(deleteResultsMsg.get(i))));
             }
+            responseStatusCode = 200;
+            responseBody =  JSON.serialize(syncRequests);
+            LogBuilder.createLog('Inbound', request, responseStatusCode, responseBody);
             return syncRequests;
         } catch (Exception e) {
             syncRequests.add(new REST_SyncRequest(REST_OperationType.DELETE_RECORD.name(), null, e.getMessage()));
+            responseStatusCode = 500;
+            responseBody =  null;
+            LogBuilder.createLog('Inbound', request, responseStatusCode, responseBody);
             return syncRequests;
         }
     }
